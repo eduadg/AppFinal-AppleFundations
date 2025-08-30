@@ -34,7 +34,7 @@ public struct HomeView: View {
                         ) {
                             // --- dentro do LazyVGrid ---
                             FeatureCard(
-                                title: "Popular Plants",
+                                title: "Doenças",
                                 systemImage: "leaf.fill",
                                 gradient: LinearGradient(
                                     colors: [

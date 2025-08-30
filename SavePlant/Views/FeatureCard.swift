@@ -46,8 +46,8 @@ public struct FeatureCard: View {
                         .font(.headline)
                         .foregroundColor(.white)
                         .shadow(radius: 3)
-                    if title == "Popular Plants" {
-                        Image(systemName: "star.fill")
+                    if title == "Doenças" {
+                        Image(systemName: "cross.circle.fill")
                             .foregroundColor(.white)
                     } else if title == "Inspirations" {
                         Image(systemName: "sparkles")
