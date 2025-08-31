@@ -32,9 +32,13 @@ public struct FeatureCard: View {
                 gradient
             }
             
+            // Overlay escuro para melhorar contraste do texto
+            Rectangle()
+                .fill(Color.black.opacity(0.3))
+            
             // Sombra no rodapé para dar contraste
             LinearGradient(
-                colors: [.clear, .black.opacity(0.5)],
+                colors: [.clear, .black.opacity(0.8)],
                 startPoint: .top, endPoint: .bottom
             )
             
@@ -43,12 +47,13 @@ public struct FeatureCard: View {
                 Spacer()
                 HStack(spacing: 8) {
                     Text(title)
-                        .font(.headline)
+                        .font(.headline.weight(.bold))
                         .foregroundColor(.white)
                         .shadow(radius: 3)
                     if title == "Doenças" {
                         Image(systemName: "cross.circle.fill")
                             .foregroundColor(.white)
+                            .font(.system(size: 18, weight: .bold))
                     } else if title == "Inspirations" {
                         Image(systemName: "sparkles")
                             .foregroundColor(.white)
@@ -57,10 +62,11 @@ public struct FeatureCard: View {
                             .foregroundColor(.white)
                     }
                 }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .background(Color.black.opacity(0.9), in: Capsule())
+                .padding(.bottom, 16)
                 .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(Color.black.opacity(0.45), in: Capsule())
-                .padding(12)
             }
         }
         .frame(height: 146)
