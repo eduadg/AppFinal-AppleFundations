@@ -55,7 +55,7 @@ public struct HomeView: View {
                             // --- dentro do LazyVGrid ---
                             FeatureCard(
                                 title: "Doenças",
-                                systemImage: "leaf.fill",
+                                systemImage: "cross.circle.fill",
                                 gradient: LinearGradient(
                                     colors: [
                                         Color(red: 0.22, green: 0.36, blue: 0.29),
@@ -65,7 +65,7 @@ public struct HomeView: View {
                                     endPoint: .bottomTrailing
                                 ),
                                 roundedCorners: [.topLeft, .bottomRight],
-                                bgImageName: "Doenças" // nome exato do asset
+                                bgImageName: nil // Temporariamente sem imagem para testar
                             )
 
                             FeatureCard(
