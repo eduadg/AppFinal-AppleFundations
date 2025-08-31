@@ -34,26 +34,28 @@ public struct FeatureCard: View {
             
             // Overlay escuro para melhorar contraste do texto
             Rectangle()
-                .fill(Color.black.opacity(0.3))
-            
-            // Sombra no rodapé para dar contraste
-            LinearGradient(
-                colors: [.clear, .black.opacity(0.8)],
-                startPoint: .top, endPoint: .bottom
-            )
+                .fill(Color.black.opacity(0.4))
             
             // Conteúdo do card (título sempre visível)
             VStack {
                 Spacer()
+                
+                // Debug: texto sempre visível para testar
+                Text("DEBUG: \(title)")
+                    .font(.caption)
+                    .foregroundColor(.red)
+                    .background(Color.yellow)
+                    .padding(4)
+                
                 HStack(spacing: 8) {
                     Text(title)
-                        .font(.headline.weight(.bold))
+                        .font(.title2.weight(.bold))
                         .foregroundColor(.white)
-                        .shadow(radius: 3)
+                        .shadow(radius: 4)
                     if title == "Doenças" {
                         Image(systemName: "cross.circle.fill")
                             .foregroundColor(.white)
-                            .font(.system(size: 18, weight: .bold))
+                            .font(.system(size: 20, weight: .bold))
                     } else if title == "Inspirations" {
                         Image(systemName: "sparkles")
                             .foregroundColor(.white)
@@ -62,11 +64,11 @@ public struct FeatureCard: View {
                             .foregroundColor(.white)
                     }
                 }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 15)
+                .background(Color.black.opacity(0.95), in: Capsule())
+                .padding(.bottom, 20)
                 .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .background(Color.black.opacity(0.9), in: Capsule())
-                .padding(.bottom, 16)
-                .padding(.horizontal, 12)
             }
         }
         .frame(height: 146)
