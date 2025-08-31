@@ -1,43 +1,42 @@
 import SwiftUI
-import AVFoundation
 
 public struct ScanView: View {
-    @State private var isCameraAuthorized = false
-    @State private var showingImagePicker = false
     @State private var capturedImage: UIImage?
     @State private var showingResults = false
+    @State private var isScanning = false
     
     public init() {}
     
     public var body: some View {
         ZStack {
-            // Fundo da câmera ou placeholder
-            if isCameraAuthorized {
-                CameraPreviewView()
-                    .ignoresSafeArea()
-            } else {
-                // Placeholder quando não há permissão
-                LinearGradient(
-                    colors: [
-                        Color(red: 0.15, green: 0.25, blue: 0.20),
-                        Color(red: 0.10, green: 0.20, blue: 0.15)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
-                
-                VStack {
+            // Fundo simulado da câmera
+            LinearGradient(
+                colors: [
+                    Color(red: 0.15, green: 0.25, blue: 0.20),
+                    Color(red: 0.10, green: 0.20, blue: 0.15)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            
+            // Adicionar algumas "folhas" simuladas para parecer uma câmera real
+            VStack {
+                Spacer()
+                HStack {
                     Spacer()
-                    Image(systemName: "camera.fill")
-                        .font(.system(size: 80))
-                        .foregroundColor(.white.opacity(0.3))
-                    Text("Camera access needed")
-                        .font(.headline)
-                        .foregroundColor(.white.opacity(0.7))
-                        .padding(.top)
+                    Image(systemName: "leaf.fill")
+                        .font(.system(size: 60))
+                        .foregroundColor(.green.opacity(0.3))
+                        .offset(x: -50, y: -30)
+                    
+                    Image(systemName: "leaf.fill")
+                        .font(.system(size: 40))
+                        .foregroundColor(.green.opacity(0.2))
+                        .offset(x: 20, y: 50)
                     Spacer()
                 }
+                Spacer()
             }
             
             // Overlay com interface de scan
@@ -111,11 +110,11 @@ public struct ScanView: View {
                     } else {
                         // Interface inicial
                         VStack(spacing: 16) {
-                            Text("Scan Your Plant")
+                            Text(isScanning ? "Scanning..." : "Scan Your Plant")
                                 .font(.title2.weight(.semibold))
                                 .foregroundColor(DS.ColorSet.textPrimary)
                             
-                            Text("Position your plant within the frame and tap capture")
+                            Text(isScanning ? "Analyzing your plant..." : "Position your plant within the frame and tap capture")
                                 .font(.body)
                                 .foregroundColor(DS.ColorSet.textSecondary)
                                 .multilineTextAlignment(.center)
@@ -129,11 +128,14 @@ public struct ScanView: View {
                                     .frame(width: 70, height: 70)
                                     .overlay(
                                         Circle()
-                                            .fill(Color(red: 0.20, green: 0.42, blue: 0.35))
+                                            .fill(isScanning ? Color.gray : Color(red: 0.20, green: 0.42, blue: 0.35))
                                             .frame(width: 60, height: 60)
+                                            .scaleEffect(isScanning ? 0.8 : 1.0)
+                                            .animation(.easeInOut(duration: 0.2), value: isScanning)
                                     )
                                     .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 3)
                             }
+                            .disabled(isScanning)
                             
                             // Botão Capture Again (se já capturou)
                             if capturedImage != nil {
@@ -159,24 +161,16 @@ public struct ScanView: View {
                 .padding(.horizontal, 0)
             }
         }
-        .onAppear {
-            requestCameraPermission()
-        }
-    }
-    
-    private func requestCameraPermission() {
-        AVCaptureDevice.requestAccess(for: .video) { granted in
-            DispatchQueue.main.async {
-                self.isCameraAuthorized = granted
-            }
-        }
     }
     
     private func capturePhoto() {
-        // Simular captura da foto
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            // Aqui você integraria com a câmera real
+        // Simular captura da foto com animação
+        isScanning = true
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            // Simular análise
             capturedImage = UIImage(systemName: "leaf.fill") // Placeholder
+            isScanning = false
             showingResults = true
         }
     }
@@ -218,20 +212,4 @@ struct CornerFrame: View {
     }
 }
 
-// Preview da câmera (placeholder - integraria com AVFoundation)
-struct CameraPreviewView: UIViewRepresentable {
-    func makeUIView(context: Context) -> UIView {
-        let view = UIView()
-        view.backgroundColor = UIColor.systemGray
-        
-        // Aqui você integraria com AVCaptureVideoPreviewLayer
-        // Por enquanto, vamos usar uma cor de placeholder
-        view.backgroundColor = UIColor(red: 0.2, green: 0.3, blue: 0.25, alpha: 1.0)
-        
-        return view
-    }
-    
-    func updateUIView(_ uiView: UIView, context: Context) {
-        // Atualizar view se necessário
-    }
-}
+
