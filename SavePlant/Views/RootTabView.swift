@@ -11,7 +11,7 @@ public struct RootTabView: View {
             Text("Favorites")
                 .tabItem { Image(systemName: "heart.fill"); Text("Favorites") }
             
-            Text("Scan")
+            ScanView()
                 .tabItem { Image(systemName: "viewfinder"); Text("Scan") }
             
             Text("Community")
