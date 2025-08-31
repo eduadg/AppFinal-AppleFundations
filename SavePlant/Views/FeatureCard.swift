@@ -61,12 +61,17 @@ public struct FeatureCard: View {
             )
             .overlay(
                 // Gradiente sutil apenas na parte inferior para contraste do texto
-                bgImageName != nil ? 
-                LinearGradient(
-                    colors: [.clear, .clear, .black.opacity(0.3)],
-                    startPoint: .top, 
-                    endPoint: .bottom
-                ) : Color.clear
+                Group {
+                    if bgImageName != nil {
+                        LinearGradient(
+                            colors: [.clear, .clear, .black.opacity(0.3)],
+                            startPoint: .top, 
+                            endPoint: .bottom
+                        )
+                    } else {
+                        Color.clear
+                    }
+                }
             )
             .cornerRadius(26, corners: roundedCorners)
             .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
