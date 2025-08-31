@@ -53,7 +53,20 @@ public struct HomeView: View {
                             spacing: DS.Spacing.md
                         ) {
                             // --- dentro do LazyVGrid ---
-                            DiseasesCard()
+                            FeatureCard(
+                                title: "Doenças",
+                                systemImage: "cross.circle.fill",
+                                gradient: LinearGradient(
+                                    colors: [
+                                        Color(red: 0.22, green: 0.36, blue: 0.29),
+                                        Color(red: 0.10, green: 0.33, blue: 0.26)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                roundedCorners: [.topLeft, .bottomRight],
+                                bgImageName: "Doenças"
+                            )
 
                             FeatureCard(
                                 title: "Inspirations",
