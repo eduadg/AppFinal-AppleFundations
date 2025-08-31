@@ -69,71 +69,64 @@ public struct HomeView: View {
                         SearchBar(text: $search)
                             .padding(.top, DS.Spacing.md)
 
-                        // Layout EXATAMENTE como na inspiração
-                        VStack(spacing: 12) {
-                            // Primeira linha: card pequeno quadrado + card alto retangular
-                            HStack(alignment: .top, spacing: 12) {
-                                // Card "Doenças" - pequeno quadrado (superior esquerdo na inspiração)
-                                FeatureCard(
-                                    title: "Doenças",
-                                    systemImage: "cross.circle.fill",
-                                    gradient: LinearGradient(
-                                        colors: [
-                                            Color(red: 0.22, green: 0.36, blue: 0.29),
-                                            Color(red: 0.10, green: 0.33, blue: 0.26)
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    roundedCorners: [.topLeft, .bottomRight],
-                                    bgImageName: "Doenças"
-                                )
-                                .frame(width: 150, height: 150)
-                                
-                                // Card "Inspirations" - retangular alto (superior direito na inspiração)
-                                FeatureCard(
-                                    title: "Inspirations",
-                                    systemImage: "sparkles",
-                                    gradient: LinearGradient(
-                                        colors: [
-                                            Color(red: 0.43, green: 0.61, blue: 0.53),
-                                            Color(red: 0.13, green: 0.41, blue: 0.32)
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    roundedCorners: [.topRight, .bottomRight]
-                                )
-                                .frame(width: 165, height: 235)
-                            }
-                            
-                            // Segunda linha: card retangular horizontal + botão oval
-                            HStack(spacing: 12) {
-                                // Card "Find A Plant" - retangular horizontal (inferior esquerdo)
-                                FeatureCard(
-                                    title: "Find A Plant",
-                                    systemImage: "magnifyingglass",
-                                    gradient: LinearGradient(
-                                        colors: [
-                                            Color(red: 0.72, green: 0.84, blue: 0.78),
-                                            Color(red: 0.30, green: 0.53, blue: 0.44)
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    roundedCorners: [.topLeft, .bottomLeft]
-                                )
-                                .frame(width: 150, height: 100)
-                                
-                                // Botão DONATE - oval como na inspiração
+                        LazyVGrid(
+                            columns: [GridItem(.flexible(), spacing: DS.Spacing.md),
+                                      GridItem(.flexible(), spacing: DS.Spacing.md)],
+                            alignment: .center,
+                            spacing: DS.Spacing.md
+                        ) {
+                            // --- dentro do LazyVGrid ---
+                            FeatureCard(
+                                title: "Doenças",
+                                systemImage: "cross.circle.fill",
+                                gradient: LinearGradient(
+                                    colors: [
+                                        Color(red: 0.22, green: 0.36, blue: 0.29),
+                                        Color(red: 0.10, green: 0.33, blue: 0.26)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                roundedCorners: [.topLeft, .bottomRight],
+                                bgImageName: "Doenças"
+                            )
+
+                            FeatureCard(
+                                title: "Inspirations",
+                                systemImage: "sparkles",
+                                gradient: LinearGradient(
+                                    colors: [
+                                        Color(red: 0.43, green: 0.61, blue: 0.53),
+                                        Color(red: 0.13, green: 0.41, blue: 0.32)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                roundedCorners: [.topRight, .bottomRight]
+                            )
+
+                            FeatureCard(
+                                title: "Find A Plant",
+                                systemImage: "magnifyingglass",
+                                gradient: LinearGradient(
+                                    colors: [
+                                        Color(red: 0.72, green: 0.84, blue: 0.78),
+                                        Color(red: 0.30, green: 0.53, blue: 0.44)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                roundedCorners: [.topLeft, .bottomLeft]
+                            )
+
+
+                            VStack {
+                                Spacer()
                                 Button("DONATE") { }
-                                    .font(.headline.weight(.bold))
-                                    .foregroundColor(.white)
-                                    .frame(width: 165, height: 55)
-                                    .background(Color(red: 0.20, green: 0.42, blue: 0.35))
-                                    .cornerRadius(27.5)
-                                    .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+                                    .buttonStyle(PrimaryButtonStyle(height: 56))
+                                Spacer()
                             }
+                            .frame(height: 146)
                         }
 
                         Text("Community Questions")

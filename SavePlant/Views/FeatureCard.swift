@@ -24,6 +24,7 @@ public struct FeatureCard: View {
         // Usando a mesma estrutura que funcionou no DiseasesCard
         Rectangle()
             .fill(Color.clear)
+            .frame(height: 146)
             .background(
                 Group {
                     if let imageName = bgImageName, let uiImage = UIImage(named: imageName) {
