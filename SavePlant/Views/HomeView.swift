@@ -98,7 +98,7 @@ public struct HomeView: View {
                     .padding(.horizontal, DS.Spacing.md)
                 }
             }
-            .navigationTitle("PlantDis")
+            .navigationTitle("SavePlant")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
