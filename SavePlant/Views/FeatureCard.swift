@@ -22,57 +22,55 @@ public struct FeatureCard: View {
     
     public var body: some View {
         ZStack {
-            // Fundo: imagem ou gradient
-            if let name = bgImageName, let ui = UIImage(named: name) {
-                Image(uiImage: ui)
-                    .resizable()
-                    .scaledToFill()
-                    .clipped()
-            } else {
-                gradient
+            // Camada de fundo
+            Group {
+                if let imageName = bgImageName, let uiImage = UIImage(named: imageName) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                } else {
+                    gradient
+                }
             }
+            .clipped()
             
-            // Overlay sutil para melhorar contraste do texto
-            LinearGradient(
-                colors: [.clear, .black.opacity(0.3)],
-                startPoint: .top, endPoint: .bottom
-            )
+            // Overlay escuro para contraste
+            Color.black.opacity(0.4)
             
-            // Conteúdo do card (título sempre visível)
+            // Texto sempre visível
             VStack {
                 Spacer()
+                
                 HStack(spacing: 8) {
                     Text(title)
-                        .font(.headline.weight(.semibold))
+                        .font(.headline.weight(.bold))
                         .foregroundColor(.white)
-                        .shadow(color: .black, radius: 2, x: 0, y: 1)
-                    if title == "Doenças" {
-                        Image(systemName: "cross.circle.fill")
-                            .foregroundColor(.white)
-                            .font(.system(size: 16, weight: .semibold))
-                            .shadow(color: .black, radius: 2, x: 0, y: 1)
-                    } else if title == "Inspirations" {
-                        Image(systemName: "sparkles")
-                            .foregroundColor(.white)
-                    } else if title == "Find A Plant" {
-                        Image(systemName: "magnifyingglass.circle.fill")
-                            .foregroundColor(.white)
+                    
+                    // Ícone baseado no título
+                    Group {
+                        if title.contains("Doenças") || title == "Doenças" {
+                            Image(systemName: "cross.circle.fill")
+                        } else if title.contains("Inspirations") {
+                            Image(systemName: "sparkles")
+                        } else if title.contains("Find") {
+                            Image(systemName: "magnifyingglass.circle.fill")
+                        } else {
+                            Image(systemName: systemImage)
+                        }
                     }
+                    .foregroundColor(.white)
+                    .font(.system(size: 16, weight: .bold))
                 }
-                .padding(.horizontal, 14)
-                .padding(.vertical, 8)
-                .background(
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(Color.black.opacity(0.7))
-                        .blur(radius: 0.5)
-                )
-                .padding(.bottom, 12)
-                .padding(.horizontal, 12)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(Color.black.opacity(0.8))
+                .cornerRadius(25)
+                .padding(.bottom, 16)
+                .padding(.horizontal, 16)
             }
         }
         .frame(height: 146)
         .cornerRadius(26, corners: roundedCorners)
-        .shadow(color: Color.black.opacity(0.07), radius: 10, x: 0, y: 6)
+        .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
     }
 }
-
