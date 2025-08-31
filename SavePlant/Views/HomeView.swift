@@ -142,5 +142,6 @@ public struct HomeView: View {
                 }
             }
         }
+    }
 }
 
