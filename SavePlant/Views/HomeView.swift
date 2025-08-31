@@ -12,34 +12,57 @@ public struct HomeView: View {
     public init() {}
 
     public var body: some View {
-        NavigationView {
-            ZStack {
-                // Fundo principal com gradiente
-                LinearGradient(
-                    colors: [
-                        Color(red: 0.95, green: 0.98, blue: 0.96), // Verde muito claro
-                        Color(red: 0.85, green: 0.95, blue: 0.90), // Verde claro
-                        Color(red: 0.75, green: 0.90, blue: 0.85)  // Verde médio claro
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
-                
-                // Padrão sutil de pontos para textura
-                GeometryReader { geometry in
-                    ForEach(0..<20, id: \.self) { _ in
-                        Circle()
-                            .fill(Color.white.opacity(0.1))
-                            .frame(width: CGFloat.random(in: 2...6))
-                            .position(
-                                x: CGFloat.random(in: 0...geometry.size.width),
-                                y: CGFloat.random(in: 0...geometry.size.height)
-                            )
-                    }
+        ZStack {
+            // Fundo principal com gradiente
+            LinearGradient(
+                colors: [
+                    Color(red: 0.95, green: 0.98, blue: 0.96), // Verde muito claro
+                    Color(red: 0.85, green: 0.95, blue: 0.90), // Verde claro
+                    Color(red: 0.75, green: 0.90, blue: 0.85)  // Verde médio claro
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            
+            // Padrão sutil de pontos para textura
+            GeometryReader { geometry in
+                ForEach(0..<20, id: \.self) { _ in
+                    Circle()
+                        .fill(Color.white.opacity(0.1))
+                        .frame(width: CGFloat.random(in: 2...6))
+                        .position(
+                            x: CGFloat.random(in: 0...geometry.size.width),
+                            y: CGFloat.random(in: 0...geometry.size.height)
+                        )
                 }
-                .ignoresSafeArea()
+            }
+            .ignoresSafeArea()
 
+            VStack(spacing: 0) {
+                // Header customizado
+                HStack {
+                    Text("SavePlant")
+                        .font(.largeTitle.weight(.bold))
+                        .foregroundColor(DS.ColorSet.textPrimary)
+                    
+                    Spacer()
+                    
+                    // Ícone do perfil
+                    Circle()
+                        .fill(DS.ColorSet.brandMuted)
+                        .frame(width: 40, height: 40)
+                        .overlay(
+                            Image(systemName: "person.fill")
+                                .foregroundColor(DS.ColorSet.brand)
+                                .font(.system(size: 16, weight: .bold))
+                        )
+                        .accessibilityLabel(Text("Profile"))
+                }
+                .padding(.horizontal, DS.Spacing.md)
+                .padding(.top, DS.Spacing.sm)
+                .padding(.bottom, DS.Spacing.xs)
+                
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(alignment: .leading, spacing: DS.Spacing.lg) {
 
@@ -118,22 +141,6 @@ public struct HomeView: View {
                     .padding(.horizontal, DS.Spacing.md)
                 }
             }
-            .navigationTitle("SavePlant")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Circle()
-                        .fill(DS.ColorSet.brandMuted)
-                        .frame(width: 30, height: 30)
-                        .overlay(
-                            Image(systemName: "person.fill")
-                                .foregroundColor(DS.ColorSet.brand)
-                                .font(.system(size: 14, weight: .bold))
-                        )
-                        .accessibilityLabel(Text("Profile"))
-                }
-            }
         }
-    }
 }
 
