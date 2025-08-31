@@ -69,11 +69,11 @@ public struct HomeView: View {
                         SearchBar(text: $search)
                             .padding(.top, DS.Spacing.md)
 
-                        // Layout seguindo EXATAMENTE a inspiração
-                        VStack(spacing: DS.Spacing.md) {
-                            // Primeira linha: card pequeno + card grande vertical (como na inspiração)
-                            HStack(alignment: .top, spacing: DS.Spacing.md) {
-                                // Card "Doenças" - pequeno quadrado (como o primeiro da inspiração)
+                        // Layout EXATAMENTE como na inspiração
+                        VStack(spacing: 12) {
+                            // Primeira linha: card pequeno quadrado + card alto retangular
+                            HStack(alignment: .top, spacing: 12) {
+                                // Card "Doenças" - pequeno quadrado (superior esquerdo na inspiração)
                                 FeatureCard(
                                     title: "Doenças",
                                     systemImage: "cross.circle.fill",
@@ -88,9 +88,9 @@ public struct HomeView: View {
                                     roundedCorners: [.topLeft, .bottomRight],
                                     bgImageName: "Doenças"
                                 )
-                                .frame(width: 155, height: 155)
+                                .frame(width: 150, height: 150)
                                 
-                                // Card "Inspirations" - grande vertical (como o da direita na inspiração)
+                                // Card "Inspirations" - retangular alto (superior direito na inspiração)
                                 FeatureCard(
                                     title: "Inspirations",
                                     systemImage: "sparkles",
@@ -104,12 +104,12 @@ public struct HomeView: View {
                                     ),
                                     roundedCorners: [.topRight, .bottomRight]
                                 )
-                                .frame(width: 155, height: 200)
+                                .frame(width: 165, height: 235)
                             }
                             
-                            // Segunda linha: card médio + botão (como na inspiração)
-                            HStack(spacing: DS.Spacing.md) {
-                                // Card "Find A Plant" - médio horizontal (como o inferior esquerdo)
+                            // Segunda linha: card retangular horizontal + botão oval
+                            HStack(spacing: 12) {
+                                // Card "Find A Plant" - retangular horizontal (inferior esquerdo)
                                 FeatureCard(
                                     title: "Find A Plant",
                                     systemImage: "magnifyingglass",
@@ -123,12 +123,16 @@ public struct HomeView: View {
                                     ),
                                     roundedCorners: [.topLeft, .bottomLeft]
                                 )
-                                .frame(width: 155, height: 120)
+                                .frame(width: 150, height: 100)
                                 
-                                // Botão DONATE - mesmo tamanho do card ao lado
+                                // Botão DONATE - oval como na inspiração
                                 Button("DONATE") { }
-                                    .buttonStyle(PrimaryButtonStyle(height: 60))
-                                    .frame(width: 155, height: 120)
+                                    .font(.headline.weight(.bold))
+                                    .foregroundColor(.white)
+                                    .frame(width: 165, height: 55)
+                                    .background(Color(red: 0.20, green: 0.42, blue: 0.35))
+                                    .cornerRadius(27.5)
+                                    .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
                             }
                         }
 
