@@ -69,11 +69,11 @@ public struct HomeView: View {
                         SearchBar(text: $search)
                             .padding(.top, DS.Spacing.md)
 
-                        // Layout customizado inspirado na segunda imagem
+                        // Layout limpo e equilibrado
                         VStack(spacing: DS.Spacing.md) {
-                            // Primeira linha: dois cards de tamanhos diferentes
+                            // Primeira linha: dois cards equilibrados
                             HStack(spacing: DS.Spacing.md) {
-                                // Card "Doenças" - menor e quadrado
+                                // Card "Doenças" - quadrado médio
                                 FeatureCard(
                                     title: "Doenças",
                                     systemImage: "cross.circle.fill",
@@ -88,9 +88,9 @@ public struct HomeView: View {
                                     roundedCorners: [.topLeft, .bottomRight],
                                     bgImageName: "Doenças"
                                 )
-                                .frame(width: 140, height: 140)
+                                .frame(width: 160, height: 160)
                                 
-                                // Card "Inspirations" - retangular mais alto
+                                // Card "Inspirations" - retangular vertical
                                 FeatureCard(
                                     title: "Inspirations",
                                     systemImage: "sparkles",
@@ -104,12 +104,12 @@ public struct HomeView: View {
                                     ),
                                     roundedCorners: [.topRight, .bottomRight]
                                 )
-                                .frame(maxWidth: .infinity, maxHeight: 180)
+                                .frame(width: 160, height: 160)
                             }
                             
-                            // Segunda linha: card menor e botão donate
+                            // Segunda linha: card largo e botão donate
                             HStack(spacing: DS.Spacing.md) {
-                                // Card "Find A Plant" - retangular mais largo
+                                // Card "Find A Plant" - retangular horizontal
                                 FeatureCard(
                                     title: "Find A Plant",
                                     systemImage: "magnifyingglass",
@@ -123,12 +123,16 @@ public struct HomeView: View {
                                     ),
                                     roundedCorners: [.topLeft, .bottomLeft]
                                 )
-                                .frame(maxWidth: .infinity, maxHeight: 120)
+                                .frame(width: 160, height: 100)
                                 
-                                // Botão DONATE - compacto
-                                Button("DONATE") { }
-                                    .buttonStyle(PrimaryButtonStyle(height: 56))
-                                    .frame(width: 120)
+                                // Botão DONATE
+                                VStack {
+                                    Spacer()
+                                    Button("DONATE") { }
+                                        .buttonStyle(PrimaryButtonStyle(height: 56))
+                                    Spacer()
+                                }
+                                .frame(width: 160, height: 100)
                             }
                         }
 
