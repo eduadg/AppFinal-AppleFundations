@@ -32,30 +32,25 @@ public struct FeatureCard: View {
                 gradient
             }
             
-            // Overlay escuro para melhorar contraste do texto
-            Rectangle()
-                .fill(Color.black.opacity(0.4))
+            // Overlay sutil para melhorar contraste do texto
+            LinearGradient(
+                colors: [.clear, .black.opacity(0.3)],
+                startPoint: .top, endPoint: .bottom
+            )
             
             // Conteúdo do card (título sempre visível)
             VStack {
                 Spacer()
-                
-                // Debug: texto sempre visível para testar
-                Text("DEBUG: \(title)")
-                    .font(.caption)
-                    .foregroundColor(.red)
-                    .background(Color.yellow)
-                    .padding(4)
-                
                 HStack(spacing: 8) {
                     Text(title)
-                        .font(.title2.weight(.bold))
+                        .font(.headline.weight(.semibold))
                         .foregroundColor(.white)
-                        .shadow(radius: 4)
+                        .shadow(color: .black, radius: 2, x: 0, y: 1)
                     if title == "Doenças" {
                         Image(systemName: "cross.circle.fill")
                             .foregroundColor(.white)
-                            .font(.system(size: 20, weight: .bold))
+                            .font(.system(size: 16, weight: .semibold))
+                            .shadow(color: .black, radius: 2, x: 0, y: 1)
                     } else if title == "Inspirations" {
                         Image(systemName: "sparkles")
                             .foregroundColor(.white)
@@ -64,11 +59,15 @@ public struct FeatureCard: View {
                             .foregroundColor(.white)
                     }
                 }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 15)
-                .background(Color.black.opacity(0.95), in: Capsule())
-                .padding(.bottom, 20)
-                .padding(.horizontal, 16)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .background(
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(Color.black.opacity(0.7))
+                        .blur(radius: 0.5)
+                )
+                .padding(.bottom, 12)
+                .padding(.horizontal, 12)
             }
         }
         .frame(height: 146)
