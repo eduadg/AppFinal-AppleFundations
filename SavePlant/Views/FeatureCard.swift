@@ -42,7 +42,7 @@ public struct FeatureCard: View {
                     .resizable()
                     .scaledToFill()
                     .clipped()
-                    .overlay(Color.black.opacity(0.5)) // Overlay escuro direto
+                    .overlay(Color.black.opacity(0.6)) // Overlay mais escuro para melhor contraste
             } else {
                 // Fallback se a imagem não carregar
                 gradient

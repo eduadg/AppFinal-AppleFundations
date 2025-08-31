@@ -65,7 +65,7 @@ public struct HomeView: View {
                                     endPoint: .bottomTrailing
                                 ),
                                 roundedCorners: [.topLeft, .bottomRight],
-                                bgImageName: nil // Temporariamente sem imagem para testar
+                                bgImageName: "Doenças" // Restaurando a imagem
                             )
 
                             FeatureCard(
