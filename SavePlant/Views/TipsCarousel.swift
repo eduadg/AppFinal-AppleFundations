@@ -5,62 +5,63 @@ public struct TipsCarousel: View {
     @State private var expandedCardIndex: Int? = nil
     @State private var currentIndex: Int = 0
     @State private var timer: Timer?
-    @State private var isAutoScrolling = true
+    @State private var offset: CGFloat = 0
     
     public init(items: [TipItem]) {
         self.items = items
     }
     
     public var body: some View {
-        ScrollViewReader { proxy in
-            ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(spacing: DS.Spacing.md) {
-                    ForEach(Array(items.enumerated()), id: \.offset) { index, tip in
-                        TipsCard(
-                            tip: tip,
-                            isExpanded: expandedCardIndex == index,
-                            onTap: {
-                                // Para o auto-scroll quando usuário interage
-                                stopAutoScroll()
-                                
-                                withAnimation(.easeInOut(duration: 0.3)) {
-                                    expandedCardIndex = expandedCardIndex == index ? nil : index
-                                }
-                                
-                                // Se fechou o card, retoma auto-scroll após 3 segundos
-                                if expandedCardIndex == index {
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                                        if expandedCardIndex == nil {
-                                            startAutoScroll(proxy: proxy)
-                                        }
-                                    }
-                                }
-                            }
-                        )
-                        .frame(width: expandedCardIndex == index ? 350 : 280)
-                        .id(index) // ID para ScrollViewReader
-                    }
+        ScrollView(.horizontal, showsIndicators: false) {
+            LazyHStack(spacing: DS.Spacing.md) {
+                ForEach(Array(items.enumerated()), id: \.offset) { index, tip in
+                    TipsCard(
+                        tip: tip,
+                        isExpanded: expandedCardIndex == index,
+                        onTap: {
+                            handleCardTap(index: index)
+                        }
+                    )
+                    .frame(width: expandedCardIndex == index ? 350 : 280)
                 }
-                .padding(.horizontal, DS.Spacing.md)
             }
-            .onAppear {
-                startAutoScroll(proxy: proxy)
-            }
-            .onDisappear {
-                stopAutoScroll()
+            .padding(.horizontal, DS.Spacing.md)
+            .offset(x: offset)
+        }
+        .onAppear {
+            startAutoScroll()
+        }
+        .onDisappear {
+            stopAutoScroll()
+        }
+    }
+    
+    private func handleCardTap(index: Int) {
+        stopAutoScroll()
+        
+        withAnimation(.easeInOut(duration: 0.3)) {
+            expandedCardIndex = expandedCardIndex == index ? nil : index
+        }
+        
+        if expandedCardIndex == index {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                if expandedCardIndex == nil {
+                    startAutoScroll()
+                }
             }
         }
     }
     
-    private func startAutoScroll(proxy: ScrollViewReader) {
-        guard isAutoScrolling && expandedCardIndex == nil else { return }
+    private func startAutoScroll() {
+        guard expandedCardIndex == nil else { return }
         
         timer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { _ in
             guard expandedCardIndex == nil else { return }
             
             withAnimation(.easeInOut(duration: 0.8)) {
                 currentIndex = (currentIndex + 1) % items.count
-                proxy.scrollTo(currentIndex, anchor: .center)
+                let cardWidth: CGFloat = 280 + DS.Spacing.md
+                offset = -CGFloat(currentIndex) * cardWidth
             }
         }
     }
@@ -68,7 +69,6 @@ public struct TipsCarousel: View {
     private func stopAutoScroll() {
         timer?.invalidate()
         timer = nil
-        isAutoScrolling = false
     }
 }
 
