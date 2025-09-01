@@ -81,16 +81,17 @@ public struct HomeView: View {
                                 FeatureCard(
                                     title: "Diagnosticar",
                                     systemImage: "camera.viewfinder",
-                                                                    gradient: LinearGradient(
-                                    colors: [
-                                        Color(red: 0.25, green: 0.40, blue: 0.32),
-                                        Color(red: 0.15, green: 0.35, blue: 0.28)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
+                                    gradient: LinearGradient(
+                                        colors: [
+                                            Color(red: 0.25, green: 0.40, blue: 0.32),
+                                            Color(red: 0.15, green: 0.35, blue: 0.28)
+                                        ],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
                                     roundedCorners: [.allCorners],
-                                    bgImageName: "Doenças"
+                                    bgImageName: "Doenças",
+                                    showCenterTag: true
                                 )
                             }
                             .buttonStyle(PlainButtonStyle())
