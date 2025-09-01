@@ -76,33 +76,28 @@ public struct HomeView: View {
                             Button(action: {
                                 showingScanView = true
                             }) {
-                                VStack(spacing: DS.Spacing.md) {
+                                HStack {
                                     Spacer()
-                                    
-                                    // Ícone da câmera centralizado e maior
                                     Image(systemName: "camera.viewfinder")
-                                        .font(.system(size: 48, weight: .bold))
+                                        .font(.system(size: 32, weight: .bold))
                                         .foregroundColor(.white)
-                                        .frame(width: 80, height: 80)
-                                        .background(
-                                            RoundedRectangle(cornerRadius: 16)
-                                                .fill(Color.white.opacity(0.2))
-                                        )
-                                    
-                                    // Texto centralizado
-                                    VStack(spacing: 4) {
-                                        Text("Diagnosticar")
-                                            .font(.title2.weight(.bold))
-                                            .foregroundColor(.white)
-                                        Text("Use a câmera para analisar")
-                                            .font(.subheadline)
-                                            .foregroundColor(.white.opacity(0.9))
-                                    }
-                                    
-                                    Spacer()
                                 }
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                .padding(DS.Spacing.md)
+                                .padding(EdgeInsets(top: DS.Spacing.md, leading: 0, bottom: 0, trailing: DS.Spacing.md))
+                                
+                                Spacer()
+                                
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Diagnosticar")
+                                        .font(.headline.weight(.bold))
+                                        .foregroundColor(.white)
+                                    Text("Use a câmera para analisar")
+                                        .font(.caption)
+                                        .foregroundColor(.white.opacity(0.8))
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(EdgeInsets(top: 0, leading: DS.Spacing.md, bottom: DS.Spacing.md, trailing: DS.Spacing.md))
+                            }
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .background(
                                 ZStack {
                                     // Imagem de fundo
