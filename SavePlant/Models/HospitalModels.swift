@@ -198,14 +198,7 @@ public class HospitalDataManager: ObservableObject {
     
     // MARK: - Mock Data
     private func loadMockData() {
-        // Criar algumas plantas de exemplo para demonstração
-        let tomatoImage = UIImage(systemName: "leaf.fill") ?? UIImage()
-        let tomatoPlant = PlantInTreatment(
-            name: "Tomate",
-            disease: "Mancha bacteriana",
-            photo: tomatoImage,
-            treatment: "Aplicar fungicida à base de cobre. Evitar molhar as folhas durante a rega. Melhorar ventilação entre as plantas."
-        )
-        plantsInTreatment.append(tomatoPlant)
+        // Hospital inicia vazio - plantas serão adicionadas manualmente pelo usuário
+        // plantsInTreatment inicia como array vazio
     }
 }
