@@ -3,29 +3,72 @@ import SwiftUI
 public struct TipsCarousel: View {
     let items: [TipItem]
     @State private var expandedCardIndex: Int? = nil
+    @State private var currentIndex: Int = 0
+    @State private var timer: Timer?
+    @State private var isAutoScrolling = true
     
     public init(items: [TipItem]) {
         self.items = items
     }
     
     public var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            LazyHStack(spacing: DS.Spacing.md) {
-                ForEach(Array(items.enumerated()), id: \.offset) { index, tip in
-                    TipsCard(
-                        tip: tip,
-                        isExpanded: expandedCardIndex == index,
-                        onTap: {
-                            withAnimation(.easeInOut(duration: 0.3)) {
-                                expandedCardIndex = expandedCardIndex == index ? nil : index
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal, showsIndicators: false) {
+                LazyHStack(spacing: DS.Spacing.md) {
+                    ForEach(Array(items.enumerated()), id: \.offset) { index, tip in
+                        TipsCard(
+                            tip: tip,
+                            isExpanded: expandedCardIndex == index,
+                            onTap: {
+                                // Para o auto-scroll quando usuário interage
+                                stopAutoScroll()
+                                
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    expandedCardIndex = expandedCardIndex == index ? nil : index
+                                }
+                                
+                                // Se fechou o card, retoma auto-scroll após 3 segundos
+                                if expandedCardIndex == index {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                                        if expandedCardIndex == nil {
+                                            startAutoScroll(proxy: proxy)
+                                        }
+                                    }
+                                }
                             }
-                        }
-                    )
-                    .frame(width: expandedCardIndex == index ? 350 : 280)
+                        )
+                        .frame(width: expandedCardIndex == index ? 350 : 280)
+                        .id(index) // ID para ScrollViewReader
+                    }
                 }
+                .padding(.horizontal, DS.Spacing.md)
             }
-            .padding(.horizontal, DS.Spacing.md)
+            .onAppear {
+                startAutoScroll(proxy: proxy)
+            }
+            .onDisappear {
+                stopAutoScroll()
+            }
         }
+    }
+    
+    private func startAutoScroll(proxy: ScrollViewReader) {
+        guard isAutoScrolling && expandedCardIndex == nil else { return }
+        
+        timer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { _ in
+            guard expandedCardIndex == nil else { return }
+            
+            withAnimation(.easeInOut(duration: 0.8)) {
+                currentIndex = (currentIndex + 1) % items.count
+                proxy.scrollTo(currentIndex, anchor: .center)
+            }
+        }
+    }
+    
+    private func stopAutoScroll() {
+        timer?.invalidate()
+        timer = nil
+        isAutoScrolling = false
     }
 }
 
@@ -38,14 +81,6 @@ struct TipsCard: View {
         Button(action: onTap) {
             VStack(alignment: .leading, spacing: DS.Spacing.sm) {
                 HStack {
-                    // Ícone da dica
-                    Image(systemName: tip.icon)
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundColor(DS.ColorSet.brand)
-                        .frame(width: 32, height: 32)
-                        .background(DS.ColorSet.brandMuted)
-                        .cornerRadius(8)
-                    
                     Spacer()
                     
                     // Indicador de expansão
