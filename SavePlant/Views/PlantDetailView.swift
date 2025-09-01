@@ -4,6 +4,7 @@ public struct PlantDetailView: View {
     @State private var plant: PlantInTreatment
     @State private var showingAddPhoto = false
     @StateObject private var hospitalData = HospitalDataManager.shared
+    @Environment(\.dismiss) private var dismiss
     
     public init(plant: PlantInTreatment) {
         self._plant = State(initialValue: plant)
@@ -106,9 +107,6 @@ public struct PlantDetailView: View {
         .sheet(isPresented: $showingAddPhoto) {
             AddPhotoView(plant: $plant)
         }
-        .onChange(of: plant) { newPlant in
-            hospitalData.updatePlant(newPlant)
-        }
     }
 }
 
@@ -125,7 +123,10 @@ struct StatusUpdateSection: View {
                 ForEach(PlantStatus.allCases, id: \.self) { status in
                     Button(action: {
                         withAnimation(.easeInOut(duration: 0.2)) {
-                            plant.updateStatus(status)
+                            var updatedPlant = plant
+                            updatedPlant.updateStatus(status)
+                            plant = updatedPlant
+                            hospitalData.updatePlant(updatedPlant)
                         }
                     }) {
                         HStack(spacing: DS.Spacing.xs) {
@@ -138,6 +139,7 @@ struct StatusUpdateSection: View {
                         .foregroundColor(plant.status == status ? .white : Color(status.color))
                         .padding(.horizontal, DS.Spacing.sm)
                         .padding(.vertical, DS.Spacing.xs)
+                        .frame(maxWidth: .infinity, minHeight: 44)
                         .background(plant.status == status ? Color(status.color) : Color(status.color).opacity(0.1))
                         .cornerRadius(DS.Radius.sm)
                     }

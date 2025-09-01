@@ -11,11 +11,8 @@ public struct RootTabView: View {
             HospitalView()
                 .tabItem { Image(systemName: "cross.case.fill"); Text("Hospital") }
             
-            Text("Enciclopédia View - Em desenvolvimento")
+                                                Text("Enciclopédia View - Em desenvolvimento")
                 .tabItem { Image(systemName: "book.pages.fill"); Text("Enciclopédia") }
-            
-            Text("Perfil View - Em desenvolvimento")
-                .tabItem { Image(systemName: "person.crop.circle"); Text("Perfil") }
         }
         .tint(DS.ColorSet.brand)
     }
