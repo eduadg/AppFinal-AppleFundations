@@ -6,19 +6,16 @@ public struct RootTabView: View {
     public var body: some View {
         TabView {
             HomeView()
-                .tabItem { Image(systemName: "house.fill"); Text("Home") }
+                .tabItem { Image(systemName: "leaf.fill"); Text("Home") }
             
-            Text("Favorites")
-                .tabItem { Image(systemName: "heart.fill"); Text("Favorites") }
+            Text("Hospital View - Em desenvolvimento")
+                .tabItem { Image(systemName: "cross.case.fill"); Text("Hospital") }
             
-            ScanView()
-                .tabItem { Image(systemName: "viewfinder"); Text("Scan") }
+            Text("Enciclopédia View - Em desenvolvimento")
+                .tabItem { Image(systemName: "book.pages.fill"); Text("Enciclopédia") }
             
-            Text("Community")
-                .tabItem { Image(systemName: "bubble.left.and.bubble.right.fill"); Text("Community") }
-            
-            Text("Profile")
-                .tabItem { Image(systemName: "person.fill"); Text("Profile") }
+            Text("Perfil View - Em desenvolvimento")
+                .tabItem { Image(systemName: "person.crop.circle"); Text("Perfil") }
         }
         .tint(DS.ColorSet.brand)
     }

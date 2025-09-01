@@ -2,12 +2,9 @@ import SwiftUI
 
 public struct HomeView: View {
     @State private var search = ""
+    @State private var showingScanView = false
 
-    private let qaMock: [QAItem] = [
-        .init(title: "What is the role of Polypodiophyta as host plant for bacterial plant pathogens?", answers: 8,  avatars: ["leaf.fill","tortoise.fill","ladybug.fill","camera.fill"]),
-        .init(title: "What could treat and remediate cumin/Nigella sativa?", answers: 5, avatars: ["flame.fill","drop.fill","hare.fill","face.smiling"]),
-        .init(title: "How to identify nutrient deficiency by leaf patterns?", answers: 12, avatars: ["bolt.fill","sun.max.fill","cloud.fill","leaf.fill"])
-    ]
+
 
     public init() {}
 
@@ -42,7 +39,7 @@ public struct HomeView: View {
             VStack(spacing: 0) {
                 // Header customizado
                 HStack {
-                    Text("SavePlant")
+                    Text("PlantSave")
                         .font(.largeTitle.weight(.bold))
                         .foregroundColor(DS.ColorSet.textPrimary)
                     
@@ -66,81 +63,165 @@ public struct HomeView: View {
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(alignment: .leading, spacing: DS.Spacing.lg) {
 
-                        SearchBar(text: $search)
+                        SearchBar(text: $search, placeholder: "Buscar planta ou doença…")
                             .padding(.top, DS.Spacing.md)
 
-                        LazyVGrid(
-                            columns: [GridItem(.flexible(), spacing: DS.Spacing.md),
-                                      GridItem(.flexible(), spacing: DS.Spacing.md)],
-                            alignment: .center,
-                            spacing: DS.Spacing.md
-                        ) {
-                            // --- dentro do LazyVGrid ---
-                            FeatureCard(
-                                title: "Doenças",
-                                systemImage: "cross.circle.fill",
-                                gradient: LinearGradient(
-                                    colors: [
-                                        Color(red: 0.22, green: 0.36, blue: 0.29),
-                                        Color(red: 0.10, green: 0.33, blue: 0.26)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                roundedCorners: [.topLeft, .bottomRight],
-                                bgImageName: "Doenças"
-                            )
-
-                            FeatureCard(
-                                title: "Inspirations",
-                                systemImage: "sparkles",
-                                gradient: LinearGradient(
-                                    colors: [
-                                        Color(red: 0.43, green: 0.61, blue: 0.53),
-                                        Color(red: 0.13, green: 0.41, blue: 0.32)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                roundedCorners: [.topRight, .bottomRight]
-                            )
-
-                            FeatureCard(
-                                title: "Find A Plant",
-                                systemImage: "magnifyingglass",
-                                gradient: LinearGradient(
-                                    colors: [
-                                        Color(red: 0.72, green: 0.84, blue: 0.78),
-                                        Color(red: 0.30, green: 0.53, blue: 0.44)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                roundedCorners: [.topLeft, .bottomLeft]
-                            )
-
-
-                            VStack {
-                                Spacer()
-                                Button("DONATE") { }
-                                    .buttonStyle(PrimaryButtonStyle(height: 56))
-                                Spacer()
+                        // Layout dos 3 cards principais
+                        VStack(spacing: DS.Spacing.md) {
+                            // Card A - Diagnosticar agora (largura total)
+                            Button(action: {
+                                showingScanView = true
+                            }) {
+                                FeatureCard(
+                                    title: "Diagnosticar",
+                                    systemImage: "camera.viewfinder",
+                                    gradient: LinearGradient(
+                                        colors: [
+                                            Color(red: 0.22, green: 0.36, blue: 0.29),
+                                            Color(red: 0.10, green: 0.33, blue: 0.26)
+                                        ],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    roundedCorners: [.allCorners],
+                                    bgImageName: "Doenças"
+                                )
                             }
-                            .frame(height: 146)
+                            .buttonStyle(PlainButtonStyle())
+                            .frame(height: 160)
+                            
+                            // Cards B e C lado a lado
+                            HStack(spacing: DS.Spacing.md) {
+                                // Card B - Hospital
+                                Button(action: {
+                                    // TODO: Navegar para Hospital
+                                }) {
+                                    VStack {
+                                        HStack {
+                                            Spacer()
+                                            Image(systemName: "cross.case.fill")
+                                                .font(.system(size: 24, weight: .bold))
+                                                .foregroundColor(.white)
+                                        }
+                                        .padding(.top, DS.Spacing.md)
+                                        .padding(.trailing, DS.Spacing.md)
+                                        
+                                        Spacer()
+                                        
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text("Hospital")
+                                                .font(.headline.weight(.bold))
+                                                .foregroundColor(.white)
+                                            Text("0 em tratamento")
+                                                .font(.caption)
+                                                .foregroundColor(.white.opacity(0.8))
+                                        }
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.horizontal, DS.Spacing.md)
+                                        .padding(.bottom, DS.Spacing.md)
+                                    }
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    .background(
+                                        LinearGradient(
+                                            colors: [
+                                                Color(red: 0.43, green: 0.61, blue: 0.53),
+                                                Color(red: 0.13, green: 0.41, blue: 0.32)
+                                            ],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
+                                    .cornerRadius(20)
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                                
+                                // Card C - Enciclopédia
+                                Button(action: {
+                                    // TODO: Navegar para Enciclopédia
+                                }) {
+                                    VStack {
+                                        HStack {
+                                            Spacer()
+                                            Image(systemName: "book.pages.fill")
+                                                .font(.system(size: 24, weight: .bold))
+                                                .foregroundColor(.white)
+                                        }
+                                        .padding(.top, DS.Spacing.md)
+                                        .padding(.trailing, DS.Spacing.md)
+                                        
+                                        Spacer()
+                                        
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text("Enciclopédia")
+                                                .font(.headline.weight(.bold))
+                                                .foregroundColor(.white)
+                                            Text("Doenças & Tratamentos")
+                                                .font(.caption)
+                                                .foregroundColor(.white.opacity(0.8))
+                                        }
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.horizontal, DS.Spacing.md)
+                                        .padding(.bottom, DS.Spacing.md)
+                                    }
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    .background(
+                                        LinearGradient(
+                                            colors: [
+                                                Color(red: 0.72, green: 0.84, blue: 0.78),
+                                                Color(red: 0.30, green: 0.53, blue: 0.44)
+                                            ],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
+                                    .cornerRadius(20)
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                            }
+                            .frame(height: 140)
                         }
 
-                        Text("Community Questions")
-                            .font(.title3.weight(.semibold))
-                            .foregroundColor(DS.ColorSet.textPrimary)
-                            .padding(.horizontal, DS.Spacing.xl)
-                            .padding(.top, DS.Spacing.sm)
-
-                        QACarousel(items: qaMock)
-                            .padding(.bottom, DS.Spacing.md)
+                        // Carrossel de Dicas
+                        VStack(alignment: .leading, spacing: DS.Spacing.md) {
+                            Text("Dicas Rápidas")
+                                .font(.title3.weight(.semibold))
+                                .foregroundColor(DS.ColorSet.textPrimary)
+                                .padding(.horizontal, DS.Spacing.md)
+                            
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 12) {
+                                    // Dica 1
+                                    TipCard(
+                                        title: "Evite molhar folhas à noite",
+                                        icon: "moon.stars.fill",
+                                        color: Color(red: 0.20, green: 0.40, blue: 0.60)
+                                    )
+                                    
+                                    // Dica 2
+                                    TipCard(
+                                        title: "Podar partes doentes",
+                                        icon: "scissors",
+                                        color: Color(red: 0.60, green: 0.20, blue: 0.40)
+                                    )
+                                    
+                                    // Dica 3
+                                    TipCard(
+                                        title: "Rotacione culturas",
+                                        icon: "arrow.triangle.2.circlepath",
+                                        color: Color(red: 0.40, green: 0.60, blue: 0.20)
+                                    )
+                                }
+                                .padding(.horizontal, DS.Spacing.md)
+                            }
+                        }
                     }
                     .padding(.horizontal, DS.Spacing.md)
+                    .padding(.bottom, DS.Spacing.lg)
                 }
             }
+        }
+        .sheet(isPresented: $showingScanView) {
+            ScanView()
         }
     }
 }
