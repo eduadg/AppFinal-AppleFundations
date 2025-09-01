@@ -89,47 +89,66 @@ struct TipDetailModal: View {
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        NavigationView {
-            VStack(alignment: .leading, spacing: DS.Spacing.lg) {
-                // Header com ícone
-                HStack {
-                    Image(systemName: tip.icon)
-                        .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(DS.ColorSet.brand)
-                        .frame(width: 48, height: 48)
-                        .background(DS.ColorSet.brandMuted)
-                        .cornerRadius(12)
-                    
-                    Spacer()
-                }
-                .padding(.top, DS.Spacing.md)
-                
-                // Título
-                Text(tip.title)
-                    .font(.title2.weight(.bold))
+        VStack(spacing: 0) {
+            // Header customizado
+            HStack {
+                Text("Dica")
+                    .font(.headline.weight(.semibold))
                     .foregroundColor(DS.ColorSet.textPrimary)
-                    .multilineTextAlignment(.leading)
-                
-                // Descrição completa
-                Text(tip.description)
-                    .font(.body)
-                    .foregroundColor(DS.ColorSet.textSecondary)
-                    .multilineTextAlignment(.leading)
-                    .lineSpacing(4)
                 
                 Spacer()
-            }
-            .padding(DS.Spacing.lg)
-            .navigationTitle("Dica")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Fechar") {
-                        dismiss()
-                    }
-                    .foregroundColor(DS.ColorSet.brand)
+                
+                Button("Fechar") {
+                    dismiss()
                 }
+                .foregroundColor(DS.ColorSet.brand)
+                .font(.system(size: 16, weight: .medium))
             }
+            .padding(DS.Spacing.md)
+            .background(Color(.systemBackground))
+            .overlay(
+                Rectangle()
+                    .fill(Color(.separator))
+                    .frame(height: 0.5),
+                alignment: .bottom
+            )
+            
+            // Conteúdo
+            ScrollView {
+                VStack(alignment: .leading, spacing: DS.Spacing.lg) {
+                    // Header com ícone
+                    HStack {
+                        Image(systemName: tip.icon)
+                            .font(.system(size: 32, weight: .bold))
+                            .foregroundColor(DS.ColorSet.brand)
+                            .frame(width: 48, height: 48)
+                            .background(DS.ColorSet.brandMuted)
+                            .cornerRadius(12)
+                        
+                        Spacer()
+                    }
+                    .padding(.top, DS.Spacing.md)
+                    
+                    // Título
+                    Text(tip.title)
+                        .font(.title2.weight(.bold))
+                        .foregroundColor(DS.ColorSet.textPrimary)
+                        .multilineTextAlignment(.leading)
+                    
+                    // Descrição completa
+                    Text(tip.description)
+                        .font(.body)
+                        .foregroundColor(DS.ColorSet.textSecondary)
+                        .multilineTextAlignment(.leading)
+                        .lineSpacing(4)
+                }
+                .padding(DS.Spacing.lg)
+                .frame(maxWidth: .infinity, alignment: .topLeading)
+            }
+            .background(Color(.systemBackground))
         }
+        .background(Color(.systemBackground))
+        .presentationDetents([.large])
+        .presentationDragIndicator(.visible)
     }
 }
