@@ -21,7 +21,7 @@ public struct TipsCarousel: View {
                             }
                         }
                     )
-                    .frame(width: expandedCardIndex == index ? 320 : 280)
+                    .frame(width: expandedCardIndex == index ? 350 : 280)
                 }
             }
             .padding(.horizontal, DS.Spacing.md)
@@ -60,6 +60,7 @@ struct TipsCard: View {
                     .foregroundColor(DS.ColorSet.textPrimary)
                     .lineLimit(isExpanded ? nil : 2)
                     .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
                 
                 // Descrição
                 Text(tip.description)
@@ -67,20 +68,25 @@ struct TipsCard: View {
                     .foregroundColor(DS.ColorSet.textSecondary)
                     .lineLimit(isExpanded ? nil : 3)
                     .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
                 
+                // Spacer apenas quando não expandido
                 if !isExpanded {
-                    Spacer(minLength: 8)
+                    Spacer(minLength: 0)
+                } else {
+                    // Pequeno espaço no final quando expandido
+                    Spacer(minLength: 4)
                 }
             }
             .padding(DS.Spacing.md)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(maxWidth: .infinity, alignment: .topLeading)
             .frame(height: isExpanded ? nil : 120)
-            .frame(minHeight: 120)
             .background(Color.white)
             .cornerRadius(DS.Radius.lg)
             .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 4)
         }
         .buttonStyle(PlainButtonStyle())
+        .animation(.easeInOut(duration: 0.3), value: isExpanded)
     }
 }
 
