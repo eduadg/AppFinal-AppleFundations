@@ -468,7 +468,7 @@ struct NotesSection: View {
                 .foregroundColor(DS.ColorSet.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .leading)
             
-            TextField("Adicione observações sobre a planta...", text: $notes, axis: .vertical)
+            TextField("Adicione observações sobre a planta...", text: $notes)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .font(.body)
                 .lineLimit(3...6)

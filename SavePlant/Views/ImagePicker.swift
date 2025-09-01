@@ -84,21 +84,16 @@ struct ImagePickerActionSheet: View {
             }
         }
         .buttonStyle(PlainButtonStyle())
-        .actionSheet(isPresented: $showingActionSheet) {
-            ActionSheet(
-                title: Text("Selecionar Foto"),
-                buttons: [
-                    .default(Text("Câmera")) {
-                        sourceType = .camera
-                        showingImagePicker = true
-                    },
-                    .default(Text("Galeria")) {
-                        sourceType = .photoLibrary
-                        showingImagePicker = true
-                    },
-                    .cancel()
-                ]
-            )
+        .confirmationDialog("Selecionar Foto", isPresented: $showingActionSheet) {
+            Button("Câmera") {
+                sourceType = .camera
+                showingImagePicker = true
+            }
+            Button("Galeria") {
+                sourceType = .photoLibrary
+                showingImagePicker = true
+            }
+            Button("Cancelar", role: .cancel) { }
         }
         .sheet(isPresented: $showingImagePicker) {
             ImagePicker(selectedImage: $selectedImage, sourceType: sourceType)

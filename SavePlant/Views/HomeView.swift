@@ -63,15 +63,13 @@ public struct HomeView: View {
                         )
                         .accessibilityLabel(Text("Profile"))
                 }
-                .padding(.horizontal, DS.Spacing.md)
-                .padding(.top, DS.Spacing.sm)
-                .padding(.bottom, DS.Spacing.xs)
+                .padding(EdgeInsets(top: DS.Spacing.sm, leading: DS.Spacing.md, bottom: DS.Spacing.xs, trailing: DS.Spacing.md))
                 
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(alignment: .leading, spacing: DS.Spacing.lg) {
 
                         SearchBar(text: $search, placeholder: "Buscar planta ou doença…")
-                            .padding(.top, DS.Spacing.md)
+                            .padding(EdgeInsets(top: DS.Spacing.md, leading: 0, bottom: 0, trailing: 0))
 
                         // Layout dos 3 cards principais
                         VStack(spacing: DS.Spacing.md) {
@@ -83,8 +81,7 @@ public struct HomeView: View {
                                         .font(.system(size: 24, weight: .bold))
                                         .foregroundColor(.white)
                                 }
-                                .padding(.top, DS.Spacing.md)
-                                .padding(.trailing, DS.Spacing.md)
+                                .padding(EdgeInsets(top: DS.Spacing.md, leading: 0, bottom: 0, trailing: DS.Spacing.md))
                                 
                                 Spacer()
                                 
@@ -97,8 +94,7 @@ public struct HomeView: View {
                                         .foregroundColor(.white.opacity(0.8))
                                 }
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.horizontal, DS.Spacing.md)
-                                .padding(.bottom, DS.Spacing.md)
+                                .padding(EdgeInsets(top: 0, leading: DS.Spacing.md, bottom: DS.Spacing.md, trailing: DS.Spacing.md))
                             }
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .background(
@@ -145,8 +141,7 @@ public struct HomeView: View {
                                                 .font(.system(size: 24, weight: .bold))
                                                 .foregroundColor(.white)
                                         }
-                                        .padding(.top, DS.Spacing.md)
-                                        .padding(.trailing, DS.Spacing.md)
+                                        .padding(EdgeInsets(top: DS.Spacing.md, leading: 0, bottom: 0, trailing: DS.Spacing.md))
                                         
                                         Spacer()
                                         
@@ -159,8 +154,7 @@ public struct HomeView: View {
                                                 .foregroundColor(.white.opacity(0.8))
                                         }
                                         .frame(maxWidth: .infinity, alignment: .leading)
-                                        .padding(.horizontal, DS.Spacing.md)
-                                        .padding(.bottom, DS.Spacing.md)
+                                        .padding(EdgeInsets(top: 0, leading: DS.Spacing.md, bottom: DS.Spacing.md, trailing: DS.Spacing.md))
                                     }
                                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                                     .background(
@@ -206,8 +200,7 @@ public struct HomeView: View {
                                                 .font(.system(size: 24, weight: .bold))
                                                 .foregroundColor(.white)
                                         }
-                                        .padding(.top, DS.Spacing.md)
-                                        .padding(.trailing, DS.Spacing.md)
+                                        .padding(EdgeInsets(top: DS.Spacing.md, leading: 0, bottom: 0, trailing: DS.Spacing.md))
                                         
                                         Spacer()
                                         
@@ -220,8 +213,7 @@ public struct HomeView: View {
                                                 .foregroundColor(.white.opacity(0.8))
                                         }
                                         .frame(maxWidth: .infinity, alignment: .leading)
-                                        .padding(.horizontal, DS.Spacing.md)
-                                        .padding(.bottom, DS.Spacing.md)
+                                        .padding(EdgeInsets(top: 0, leading: DS.Spacing.md, bottom: DS.Spacing.md, trailing: DS.Spacing.md))
                                     }
                                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                                     .background(
@@ -262,14 +254,12 @@ public struct HomeView: View {
                         Text("Dicas da Comunidade")
                             .font(.title3.weight(.semibold))
                             .foregroundColor(DS.ColorSet.textPrimary)
-                            .padding(.horizontal, DS.Spacing.xl)
-                            .padding(.top, DS.Spacing.sm)
+                            .padding(EdgeInsets(top: DS.Spacing.sm, leading: DS.Spacing.xl, bottom: 0, trailing: DS.Spacing.xl))
 
                         TipsCarousel(items: tipsData)
-                            .padding(.bottom, DS.Spacing.md)
+                            .padding(EdgeInsets(top: 0, leading: 0, bottom: DS.Spacing.md, trailing: 0))
                     }
-                    .padding(.horizontal, DS.Spacing.md)
-                    .padding(.bottom, DS.Spacing.lg)
+                    .padding(EdgeInsets(top: 0, leading: DS.Spacing.md, bottom: DS.Spacing.lg, trailing: DS.Spacing.md))
                 }
             }
         }
@@ -312,8 +302,7 @@ public struct HomeView: View {
                                 .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
                         }
                     }
-                    .padding(.trailing, DS.Spacing.lg)
-                    .padding(.bottom, DS.Spacing.lg)
+                    .padding(EdgeInsets(top: 0, leading: 0, bottom: DS.Spacing.lg, trailing: DS.Spacing.lg))
                 }
             }
         )

@@ -50,7 +50,7 @@ struct CustomDiseaseView: View {
                                 .foregroundColor(DS.ColorSet.textPrimary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             
-                            TextField("Descreva o tratamento recomendado...", text: $customTreatment, axis: .vertical)
+                            TextField("Descreva o tratamento recomendado...", text: $customTreatment)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
                                 .font(.body)
                                 .lineLimit(4...8)
@@ -72,10 +72,10 @@ struct CustomDiseaseView: View {
                             }
                             
                             VStack(alignment: .leading, spacing: DS.Spacing.sm) {
-                                TipItem(text: "Seja específico sobre os produtos a serem usados")
-                                TipItem(text: "Inclua a frequência de aplicação")
-                                TipItem(text: "Mencione cuidados ambientais (luz, água, etc.)")
-                                TipItem(text: "Adicione medidas preventivas")
+                                CustomTipItem(text: "Seja específico sobre os produtos a serem usados")
+                                CustomTipItem(text: "Inclua a frequência de aplicação")
+                                CustomTipItem(text: "Mencione cuidados ambientais (luz, água, etc.)")
+                                CustomTipItem(text: "Adicione medidas preventivas")
                             }
                         }
                         .padding(DS.Spacing.md)
@@ -110,7 +110,7 @@ struct CustomDiseaseView: View {
     }
 }
 
-struct TipItem: View {
+struct CustomTipItem: View {
     let text: String
     
     var body: some View {
