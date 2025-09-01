@@ -128,16 +128,34 @@ public struct HomeView: View {
                                     }
                                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                                     .background(
-                                        LinearGradient(
-                                            colors: [
-                                                Color(red: 0.43, green: 0.61, blue: 0.53),
-                                                Color(red: 0.13, green: 0.41, blue: 0.32)
-                                            ],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        )
+                                        ZStack {
+                                            // Imagem de fundo
+                                            if let hospitalImage = UIImage(named: "hospital") {
+                                                Image(uiImage: hospitalImage)
+                                                    .resizable()
+                                                    .scaledToFill()
+                                            } else {
+                                                // Fallback gradient
+                                                LinearGradient(
+                                                    colors: [
+                                                        Color(red: 0.43, green: 0.61, blue: 0.53),
+                                                        Color(red: 0.13, green: 0.41, blue: 0.32)
+                                                    ],
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                )
+                                            }
+                                            
+                                            // Overlay para melhorar legibilidade do texto
+                                            LinearGradient(
+                                                colors: [.clear, .clear, .black.opacity(0.4)],
+                                                startPoint: .top, 
+                                                endPoint: .bottom
+                                            )
+                                        }
                                     )
                                     .cornerRadius(20)
+                                    .clipped()
                                 }
                                 .buttonStyle(PlainButtonStyle())
                                 
@@ -171,16 +189,34 @@ public struct HomeView: View {
                                     }
                                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                                     .background(
-                                        LinearGradient(
-                                            colors: [
-                                                Color(red: 0.72, green: 0.84, blue: 0.78),
-                                                Color(red: 0.30, green: 0.53, blue: 0.44)
-                                            ],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        )
+                                        ZStack {
+                                            // Imagem de fundo
+                                            if let enciclopediaImage = UIImage(named: "enciclopedia") {
+                                                Image(uiImage: enciclopediaImage)
+                                                    .resizable()
+                                                    .scaledToFill()
+                                            } else {
+                                                // Fallback gradient
+                                                LinearGradient(
+                                                    colors: [
+                                                        Color(red: 0.72, green: 0.84, blue: 0.78),
+                                                        Color(red: 0.30, green: 0.53, blue: 0.44)
+                                                    ],
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                )
+                                            }
+                                            
+                                            // Overlay para melhorar legibilidade do texto
+                                            LinearGradient(
+                                                colors: [.clear, .clear, .black.opacity(0.4)],
+                                                startPoint: .top, 
+                                                endPoint: .bottom
+                                            )
+                                        }
                                     )
                                     .cornerRadius(20)
+                                    .clipped()
                                 }
                                 .buttonStyle(PlainButtonStyle())
                             }
