@@ -16,24 +16,24 @@ public struct HomeView: View {
 
     public var body: some View {
         ZStack {
-            // Fundo principal com gradiente
+            // Fundo moderno com cores mais equilibradas
             LinearGradient(
                 colors: [
-                    Color(red: 0.95, green: 0.98, blue: 0.96), // Verde muito claro
-                    Color(red: 0.85, green: 0.95, blue: 0.90), // Verde claro
-                    Color(red: 0.75, green: 0.90, blue: 0.85)  // Verde médio claro
+                    Color(red: 0.98, green: 0.99, blue: 0.98), // Branco quase puro
+                    Color(red: 0.94, green: 0.97, blue: 0.95), // Verde muito sutil
+                    Color(red: 0.92, green: 0.95, blue: 0.93)  // Verde ultra suave
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
             .ignoresSafeArea()
             
-            // Padrão sutil de pontos para textura
+            // Textura mais sutil e moderna
             GeometryReader { geometry in
-                ForEach(0..<20, id: \.self) { _ in
+                ForEach(0..<12, id: \.self) { _ in
                     Circle()
-                        .fill(Color.white.opacity(0.1))
-                        .frame(width: CGFloat.random(in: 2...6))
+                        .fill(Color(red: 0.85, green: 0.92, blue: 0.88).opacity(0.08))
+                        .frame(width: CGFloat.random(in: 4...12))
                         .position(
                             x: CGFloat.random(in: 0...geometry.size.width),
                             y: CGFloat.random(in: 0...geometry.size.height)
@@ -81,14 +81,14 @@ public struct HomeView: View {
                                 FeatureCard(
                                     title: "Diagnosticar",
                                     systemImage: "camera.viewfinder",
-                                    gradient: LinearGradient(
-                                        colors: [
-                                            Color(red: 0.22, green: 0.36, blue: 0.29),
-                                            Color(red: 0.10, green: 0.33, blue: 0.26)
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
+                                                                    gradient: LinearGradient(
+                                    colors: [
+                                        Color(red: 0.25, green: 0.40, blue: 0.32),
+                                        Color(red: 0.15, green: 0.35, blue: 0.28)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
                                     roundedCorners: [.allCorners],
                                     bgImageName: "Doenças"
                                 )
@@ -138,8 +138,8 @@ public struct HomeView: View {
                                                 // Fallback gradient
                                                 LinearGradient(
                                                     colors: [
-                                                        Color(red: 0.43, green: 0.61, blue: 0.53),
-                                                        Color(red: 0.13, green: 0.41, blue: 0.32)
+                                                        Color(red: 0.45, green: 0.63, blue: 0.55),
+                                                        Color(red: 0.18, green: 0.43, blue: 0.34)
                                                     ],
                                                     startPoint: .topLeading,
                                                     endPoint: .bottomTrailing
@@ -199,8 +199,8 @@ public struct HomeView: View {
                                                 // Fallback gradient
                                                 LinearGradient(
                                                     colors: [
-                                                        Color(red: 0.72, green: 0.84, blue: 0.78),
-                                                        Color(red: 0.30, green: 0.53, blue: 0.44)
+                                                        Color(red: 0.70, green: 0.82, blue: 0.76),
+                                                        Color(red: 0.32, green: 0.55, blue: 0.46)
                                                     ],
                                                     startPoint: .topLeading,
                                                     endPoint: .bottomTrailing
