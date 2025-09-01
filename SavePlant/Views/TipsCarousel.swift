@@ -35,6 +35,15 @@ public struct TipsCarousel: View {
                 currentIndex = (currentIndex + 1) % items.count
                 let cardWidth: CGFloat = 280 + DS.Spacing.md
                 offset = -CGFloat(currentIndex) * cardWidth
+                
+                // Quando chegar ao final, resetar para o início sem animação
+                if currentIndex == 0 {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                        withAnimation(.none) {
+                            offset = 0
+                        }
+                    }
+                }
             }
         }
     }

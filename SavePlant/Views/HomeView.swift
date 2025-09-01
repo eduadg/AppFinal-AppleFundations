@@ -81,6 +81,7 @@ public struct HomeView: View {
                                     Image(systemName: "camera.viewfinder")
                                         .font(.system(size: 32, weight: .bold))
                                         .foregroundColor(.white)
+                                        .offset(y: -8) // Subindo o ícone um pouco
                                 }
                                 .padding(EdgeInsets(top: DS.Spacing.md, leading: 0, bottom: 0, trailing: DS.Spacing.md))
                                 
