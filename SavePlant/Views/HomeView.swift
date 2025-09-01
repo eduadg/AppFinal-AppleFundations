@@ -76,28 +76,33 @@ public struct HomeView: View {
                             Button(action: {
                                 showingScanView = true
                             }) {
-                                HStack {
+                                VStack(spacing: DS.Spacing.md) {
                                     Spacer()
+                                    
+                                    // Ícone da câmera centralizado e maior
                                     Image(systemName: "camera.viewfinder")
-                                        .font(.system(size: 24, weight: .bold))
+                                        .font(.system(size: 48, weight: .bold))
                                         .foregroundColor(.white)
+                                        .frame(width: 80, height: 80)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 16)
+                                                .fill(Color.white.opacity(0.2))
+                                        )
+                                    
+                                    // Texto centralizado
+                                    VStack(spacing: 4) {
+                                        Text("Diagnosticar")
+                                            .font(.title2.weight(.bold))
+                                            .foregroundColor(.white)
+                                        Text("Use a câmera para analisar")
+                                            .font(.subheadline)
+                                            .foregroundColor(.white.opacity(0.9))
+                                    }
+                                    
+                                    Spacer()
                                 }
-                                .padding(EdgeInsets(top: DS.Spacing.md, leading: 0, bottom: 0, trailing: DS.Spacing.md))
-                                
-                                Spacer()
-                                
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text("Diagnosticar")
-                                        .font(.headline.weight(.bold))
-                                        .foregroundColor(.white)
-                                    Text("Use a câmera para analisar")
-                                        .font(.caption)
-                                        .foregroundColor(.white.opacity(0.8))
-                                }
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(EdgeInsets(top: 0, leading: DS.Spacing.md, bottom: DS.Spacing.md, trailing: DS.Spacing.md))
-                            }
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .padding(DS.Spacing.md)
                             .background(
                                 ZStack {
                                     // Imagem de fundo
@@ -270,28 +275,6 @@ public struct HomeView: View {
         .sheet(isPresented: $showingScanView) {
             ScanView()
         }
-        .overlay(
-            // Floating Action Button
-            VStack {
-                Spacer()
-                HStack {
-                    Spacer()
-                    // Scan Button
-                    Button(action: {
-                        showingScanView = true
-                    }) {
-                        Image(systemName: "camera.viewfinder")
-                            .font(.system(size: 24, weight: .semibold))
-                            .foregroundColor(.white)
-                            .frame(width: 56, height: 56)
-                            .background(DS.ColorSet.brand)
-                            .clipShape(Circle())
-                            .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
-                    }
-                    .padding(EdgeInsets(top: 0, leading: 0, bottom: DS.Spacing.lg, trailing: DS.Spacing.lg))
-                }
-            }
-        )
     }
 }
 
