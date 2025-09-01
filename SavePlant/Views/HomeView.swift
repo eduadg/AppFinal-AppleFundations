@@ -3,7 +3,6 @@ import SwiftUI
 public struct HomeView: View {
     @State private var search = ""
     @State private var showingScanView = false
-    @State private var showingAddPlantManually = false
 
     private let tipsData: [TipItem] = [
         .init(title: "Evite molhar folhas à noite", description: "A umidade noturna favorece o desenvolvimento de fungos", icon: "moon.stars.fill"),
@@ -266,41 +265,23 @@ public struct HomeView: View {
         .sheet(isPresented: $showingScanView) {
             ScanView()
         }
-        .sheet(isPresented: $showingAddPlantManually) {
-            AddPlantManuallyView()
-        }
         .overlay(
             // Floating Action Button
             VStack {
                 Spacer()
                 HStack {
                     Spacer()
-                    VStack(spacing: DS.Spacing.sm) {
-                        // Add Plant Manually Button
-                        Button(action: {
-                            showingAddPlantManually = true
-                        }) {
-                            Image(systemName: "plus.circle.fill")
-                                .font(.system(size: 24, weight: .semibold))
-                                .foregroundColor(.white)
-                                .frame(width: 56, height: 56)
-                                .background(DS.ColorSet.brandMuted)
-                                .clipShape(Circle())
-                                .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
-                        }
-                        
-                        // Scan Button
-                        Button(action: {
-                            showingScanView = true
-                        }) {
-                            Image(systemName: "camera.viewfinder")
-                                .font(.system(size: 24, weight: .semibold))
-                                .foregroundColor(.white)
-                                .frame(width: 56, height: 56)
-                                .background(DS.ColorSet.brand)
-                                .clipShape(Circle())
-                                .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
-                        }
+                    // Scan Button
+                    Button(action: {
+                        showingScanView = true
+                    }) {
+                        Image(systemName: "camera.viewfinder")
+                            .font(.system(size: 24, weight: .semibold))
+                            .foregroundColor(.white)
+                            .frame(width: 56, height: 56)
+                            .background(DS.ColorSet.brand)
+                            .clipShape(Circle())
+                            .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
                     }
                     .padding(EdgeInsets(top: 0, leading: 0, bottom: DS.Spacing.lg, trailing: DS.Spacing.lg))
                 }
