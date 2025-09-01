@@ -79,31 +79,52 @@ public struct ScanView: View {
                     if showingResults {
                         // Resultado após captura
                         VStack(spacing: 16) {
-                            Text("Plant Analysis")
+                            Text("Análise Concluída")
                                 .font(.title2.weight(.semibold))
                                 .foregroundColor(DS.ColorSet.textPrimary)
                             
-                            Text("Analyzing your plant...")
+                            Text("Doença detectada: Mancha bacteriana")
                                 .font(.body)
                                 .foregroundColor(DS.ColorSet.textSecondary)
                                 .multilineTextAlignment(.center)
                             
-                            // Botão Next
-                            Button(action: {
-                                // Ação do Next
-                                showingResults = false
-                            }) {
-                                HStack {
-                                    Text("Next")
-                                        .font(.headline.weight(.semibold))
-                                    Image(systemName: "arrow.right")
-                                        .font(.system(size: 16, weight: .semibold))
+                            VStack(spacing: 12) {
+                                // Botão Salvar no Hospital
+                                Button(action: {
+                                    saveToHospital()
+                                }) {
+                                    HStack {
+                                        Image(systemName: "cross.case.fill")
+                                            .font(.system(size: 16, weight: .semibold))
+                                        
+                                        Text("Salvar no Hospital")
+                                            .font(.system(size: 16, weight: .semibold))
+                                    }
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 50)
+                                    .background(DS.ColorSet.brand)
+                                    .cornerRadius(25)
                                 }
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 50)
-                                .background(Color(red: 0.20, green: 0.42, blue: 0.35))
-                                .cornerRadius(25)
+                                
+                                // Botão Ver Tratamento
+                                Button(action: {
+                                    // TODO: Implementar visualização de tratamento
+                                    showingResults = false
+                                }) {
+                                    HStack {
+                                        Image(systemName: "leaf.fill")
+                                            .font(.system(size: 16, weight: .semibold))
+                                        
+                                        Text("Ver Tratamento")
+                                            .font(.system(size: 16, weight: .semibold))
+                                    }
+                                    .foregroundColor(DS.ColorSet.brand)
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 50)
+                                    .background(DS.ColorSet.brandMuted)
+                                    .cornerRadius(25)
+                                }
                             }
                             .padding(.horizontal, 20)
                         }
@@ -173,6 +194,20 @@ public struct ScanView: View {
             isScanning = false
             showingResults = true
         }
+    }
+    
+    private func saveToHospital() {
+        guard let image = capturedImage else { return }
+        
+        let newPlant = PlantInTreatment(
+            name: "Tomate",
+            disease: "Mancha bacteriana",
+            photo: image,
+            treatment: "Aplicar fungicida à base de cobre. Evitar molhar as folhas durante a rega. Melhorar ventilação entre as plantas."
+        )
+        
+        HospitalDataManager.shared.addPlant(newPlant)
+        showingResults = false
     }
 }
 

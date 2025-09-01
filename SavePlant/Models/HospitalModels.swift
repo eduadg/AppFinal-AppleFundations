@@ -1,0 +1,137 @@
+import Foundation
+import UIKit
+
+// MARK: - Plant Status
+public enum PlantStatus: String, CaseIterable {
+    case inTreatment = "Em tratamento"
+    case cured = "Curada"
+    case worsening = "Piorando"
+    case stable = "Estável"
+    case improving = "Melhorando"
+    
+    var color: UIColor {
+        switch self {
+        case .inTreatment:
+            return UIColor.systemOrange
+        case .cured:
+            return UIColor.systemGreen
+        case .worsening:
+            return UIColor.systemRed
+        case .stable:
+            return UIColor.systemYellow
+        case .improving:
+            return UIColor.systemBlue
+        }
+    }
+    
+    var iconName: String {
+        switch self {
+        case .inTreatment:
+            return "cross.case.fill"
+        case .cured:
+            return "checkmark.seal.fill"
+        case .worsening:
+            return "arrow.down.circle.fill"
+        case .stable:
+            return "minus.circle.fill"
+        case .improving:
+            return "arrow.up.circle.fill"
+        }
+    }
+}
+
+// MARK: - Plant Analysis Entry
+public struct PlantAnalysis: Identifiable {
+    public let id = UUID()
+    public let photo: UIImage
+    public let date: Date
+    public let notes: String?
+    
+    public init(photo: UIImage, date: Date = Date(), notes: String? = nil) {
+        self.photo = photo
+        self.date = date
+        self.notes = notes
+    }
+}
+
+// MARK: - Plant in Treatment
+public struct PlantInTreatment: Identifiable {
+    public let id = UUID()
+    public let name: String
+    public let disease: String
+    public var status: PlantStatus
+    public let diagnosisDate: Date
+    public var lastUpdate: Date
+    public var analyses: [PlantAnalysis]
+    public let treatment: String
+    
+    // Computed properties
+    public var latestPhoto: UIImage? {
+        analyses.last?.photo
+    }
+    
+    public var timeline: [PlantAnalysis] {
+        analyses.sorted { $0.date < $1.date }
+    }
+    
+    public init(name: String, disease: String, status: PlantStatus = .inTreatment, photo: UIImage, treatment: String) {
+        self.name = name
+        self.disease = disease
+        self.status = status
+        self.diagnosisDate = Date()
+        self.lastUpdate = Date()
+        self.treatment = treatment
+        self.analyses = [PlantAnalysis(photo: photo)]
+    }
+    
+    public mutating func addAnalysis(_ analysis: PlantAnalysis) {
+        analyses.append(analysis)
+        lastUpdate = Date()
+    }
+    
+    public mutating func updateStatus(_ newStatus: PlantStatus) {
+        status = newStatus
+        lastUpdate = Date()
+    }
+}
+
+// MARK: - Hospital Data Manager
+public class HospitalDataManager: ObservableObject {
+    @Published public var plantsInTreatment: [PlantInTreatment] = []
+    
+    public static let shared = HospitalDataManager()
+    
+    private init() {
+        loadMockData()
+    }
+    
+    public func addPlant(_ plant: PlantInTreatment) {
+        plantsInTreatment.append(plant)
+    }
+    
+    public func updatePlant(_ plant: PlantInTreatment) {
+        if let index = plantsInTreatment.firstIndex(where: { $0.id == plant.id }) {
+            plantsInTreatment[index] = plant
+        }
+    }
+    
+    public func removePlant(withId id: UUID) {
+        plantsInTreatment.removeAll { $0.id == id }
+    }
+    
+    // MARK: - Mock Data
+    private func loadMockData() {
+        // Criar algumas plantas de exemplo para demonstração
+        if let tomatoImage = UIImage(named: "Doenças") {
+            let tomatoPlant = PlantInTreatment(
+                name: "Tomate",
+                disease: "Mancha bacteriana",
+                photo: tomatoImage,
+                treatment: "Aplicar fungicida à base de cobre. Evitar molhar as folhas durante a rega. Melhorar ventilação entre as plantas."
+            )
+            plantsInTreatment.append(tomatoPlant)
+        }
+        
+        // Adicionar mais plantas se necessário para demonstração
+    }
+}

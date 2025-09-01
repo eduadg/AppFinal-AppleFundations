@@ -8,7 +8,7 @@ public struct RootTabView: View {
             HomeView()
                 .tabItem { Image(systemName: "leaf.fill"); Text("Home") }
             
-            Text("Hospital View - Em desenvolvimento")
+            HospitalView()
                 .tabItem { Image(systemName: "cross.case.fill"); Text("Hospital") }
             
             Text("Enciclopédia View - Em desenvolvimento")
