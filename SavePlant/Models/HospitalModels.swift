@@ -41,7 +41,7 @@ public enum PlantStatus: String, CaseIterable {
 }
 
 // MARK: - Plant Analysis Entry
-public struct PlantAnalysis: Identifiable {
+public struct PlantAnalysis: Identifiable, Equatable {
     public let id = UUID()
     public let photo: UIImage
     public let date: Date
@@ -52,10 +52,15 @@ public struct PlantAnalysis: Identifiable {
         self.date = date
         self.notes = notes
     }
+    
+    // MARK: - Equatable
+    public static func == (lhs: PlantAnalysis, rhs: PlantAnalysis) -> Bool {
+        return lhs.id == rhs.id
+    }
 }
 
 // MARK: - Plant in Treatment
-public struct PlantInTreatment: Identifiable {
+public struct PlantInTreatment: Identifiable, Equatable {
     public let id = UUID()
     public let name: String
     public let disease: String
@@ -92,6 +97,11 @@ public struct PlantInTreatment: Identifiable {
     public mutating func updateStatus(_ newStatus: PlantStatus) {
         status = newStatus
         lastUpdate = Date()
+    }
+    
+    // MARK: - Equatable
+    public static func == (lhs: PlantInTreatment, rhs: PlantInTreatment) -> Bool {
+        return lhs.id == rhs.id
     }
 }
 
