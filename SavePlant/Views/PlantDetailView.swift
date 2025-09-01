@@ -112,6 +112,7 @@ public struct PlantDetailView: View {
 
 struct StatusUpdateSection: View {
     @Binding var plant: PlantInTreatment
+    @StateObject private var hospitalData = HospitalDataManager.shared
     
     var body: some View {
         VStack(alignment: .leading, spacing: DS.Spacing.md) {
