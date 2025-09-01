@@ -73,7 +73,9 @@ public struct HomeView: View {
                         // Layout dos 3 cards principais
                         VStack(spacing: DS.Spacing.md) {
                             // Card A - Diagnosticar agora (largura total)
-                            VStack {
+                            Button(action: {
+                                showingScanView = true
+                            }) {
                                 HStack {
                                     Spacer()
                                     Image(systemName: "camera.viewfinder")
@@ -126,12 +128,14 @@ public struct HomeView: View {
                             .cornerRadius(20)
                             .clipped()
                             .frame(height: 160)
+                            .buttonStyle(PlainButtonStyle())
                             
                             // Cards B e C lado a lado
                             HStack(spacing: DS.Spacing.md) {
                                 // Card B - Hospital
                                 Button(action: {
-                                    // TODO: Navegar para Hospital
+                                    // Navegação para Hospital será feita via TabView
+                                    // Por enquanto, mostra uma mensagem informativa
                                 }) {
                                     VStack {
                                         HStack {
@@ -190,7 +194,8 @@ public struct HomeView: View {
                                 
                                 // Card C - Enciclopédia
                                 Button(action: {
-                                    // TODO: Navegar para Enciclopédia
+                                    // Navegação para Enciclopédia será feita via TabView
+                                    // Por enquanto, mostra uma mensagem informativa
                                 }) {
                                     VStack {
                                         HStack {
