@@ -62,8 +62,8 @@ public struct HospitalView: View {
                     }
                 }
             }
-            .navigationTitle("Minhas Plantas em Tratamento")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationTitle("Hospital")
+            .navigationBarTitleDisplayMode(.inline)
             .overlay(
                 // Floating Action Button
                 VStack {
