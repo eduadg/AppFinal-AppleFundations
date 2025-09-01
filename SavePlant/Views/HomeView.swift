@@ -4,6 +4,12 @@ public struct HomeView: View {
     @State private var search = ""
     @State private var showingScanView = false
 
+    private let tipsData: [TipItem] = [
+        .init(title: "Evite molhar folhas à noite", description: "A umidade noturna favorece o desenvolvimento de fungos", icon: "moon.stars.fill"),
+        .init(title: "Podar partes doentes", description: "Remova folhas e galhos infectados para evitar propagação", icon: "scissors"),
+        .init(title: "Rotacione culturas", description: "Alterne os tipos de plantas para manter o solo saudável", icon: "arrow.triangle.2.circlepath")
+    ]
+
 
 
     public init() {}
@@ -181,39 +187,14 @@ public struct HomeView: View {
                             .frame(height: 140)
                         }
 
-                        // Carrossel de Dicas
-                        VStack(alignment: .leading, spacing: DS.Spacing.md) {
-                            Text("Dicas Rápidas")
-                                .font(.title3.weight(.semibold))
-                                .foregroundColor(DS.ColorSet.textPrimary)
-                                .padding(.horizontal, DS.Spacing.md)
-                            
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 12) {
-                                    // Dica 1
-                                    TipCard(
-                                        title: "Evite molhar folhas à noite",
-                                        icon: "moon.stars.fill",
-                                        color: Color(red: 0.20, green: 0.40, blue: 0.60)
-                                    )
-                                    
-                                    // Dica 2
-                                    TipCard(
-                                        title: "Podar partes doentes",
-                                        icon: "scissors",
-                                        color: Color(red: 0.60, green: 0.20, blue: 0.40)
-                                    )
-                                    
-                                    // Dica 3
-                                    TipCard(
-                                        title: "Rotacione culturas",
-                                        icon: "arrow.triangle.2.circlepath",
-                                        color: Color(red: 0.40, green: 0.60, blue: 0.20)
-                                    )
-                                }
-                                .padding(.horizontal, DS.Spacing.md)
-                            }
-                        }
+                        Text("Dicas da Comunidade")
+                            .font(.title3.weight(.semibold))
+                            .foregroundColor(DS.ColorSet.textPrimary)
+                            .padding(.horizontal, DS.Spacing.xl)
+                            .padding(.top, DS.Spacing.sm)
+
+                        TipsCarousel(items: tipsData)
+                            .padding(.bottom, DS.Spacing.md)
                     }
                     .padding(.horizontal, DS.Spacing.md)
                     .padding(.bottom, DS.Spacing.lg)
