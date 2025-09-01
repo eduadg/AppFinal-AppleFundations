@@ -3,6 +3,7 @@ import SwiftUI
 public struct HomeView: View {
     @State private var search = ""
     @State private var showingScanView = false
+    @State private var showingAddPlantManually = false
 
     private let tipsData: [TipItem] = [
         .init(title: "Evite molhar folhas à noite", description: "A umidade noturna favorece o desenvolvimento de fungos", icon: "moon.stars.fill"),
@@ -75,26 +76,60 @@ public struct HomeView: View {
                         // Layout dos 3 cards principais
                         VStack(spacing: DS.Spacing.md) {
                             // Card A - Diagnosticar agora (largura total)
-                            Button(action: {
-                                showingScanView = true
-                            }) {
-                                FeatureCard(
-                                    title: "Diagnosticar",
-                                    systemImage: "camera.viewfinder",
-                                    gradient: LinearGradient(
-                                        colors: [
-                                            Color(red: 0.25, green: 0.40, blue: 0.32),
-                                            Color(red: 0.15, green: 0.35, blue: 0.28)
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    roundedCorners: [.allCorners],
-                                    bgImageName: "Doenças",
-                                    showCenterTag: true
-                                )
+                            VStack {
+                                HStack {
+                                    Spacer()
+                                    Image(systemName: "camera.viewfinder")
+                                        .font(.system(size: 24, weight: .bold))
+                                        .foregroundColor(.white)
+                                }
+                                .padding(.top, DS.Spacing.md)
+                                .padding(.trailing, DS.Spacing.md)
+                                
+                                Spacer()
+                                
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Diagnosticar")
+                                        .font(.headline.weight(.bold))
+                                        .foregroundColor(.white)
+                                    Text("Use a câmera para analisar")
+                                        .font(.caption)
+                                        .foregroundColor(.white.opacity(0.8))
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal, DS.Spacing.md)
+                                .padding(.bottom, DS.Spacing.md)
                             }
-                            .buttonStyle(PlainButtonStyle())
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(
+                                ZStack {
+                                    // Imagem de fundo
+                                    if let doencasImage = UIImage(named: "Doenças") {
+                                        Image(uiImage: doencasImage)
+                                            .resizable()
+                                            .scaledToFill()
+                                    } else {
+                                        // Fallback gradient
+                                        LinearGradient(
+                                            colors: [
+                                                Color(red: 0.25, green: 0.40, blue: 0.32),
+                                                Color(red: 0.15, green: 0.35, blue: 0.28)
+                                            ],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    }
+                                    
+                                    // Overlay para melhorar legibilidade do texto
+                                    LinearGradient(
+                                        colors: [.clear, .clear, .black.opacity(0.4)],
+                                        startPoint: .top, 
+                                        endPoint: .bottom
+                                    )
+                                }
+                            )
+                            .cornerRadius(20)
+                            .clipped()
                             .frame(height: 160)
                             
                             // Cards B e C lado a lado
@@ -241,6 +276,47 @@ public struct HomeView: View {
         .sheet(isPresented: $showingScanView) {
             ScanView()
         }
+        .sheet(isPresented: $showingAddPlantManually) {
+            AddPlantManuallyView()
+        }
+        .overlay(
+            // Floating Action Button
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    VStack(spacing: DS.Spacing.sm) {
+                        // Add Plant Manually Button
+                        Button(action: {
+                            showingAddPlantManually = true
+                        }) {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.system(size: 24, weight: .semibold))
+                                .foregroundColor(.white)
+                                .frame(width: 56, height: 56)
+                                .background(DS.ColorSet.brandMuted)
+                                .clipShape(Circle())
+                                .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+                        }
+                        
+                        // Scan Button
+                        Button(action: {
+                            showingScanView = true
+                        }) {
+                            Image(systemName: "camera.viewfinder")
+                                .font(.system(size: 24, weight: .semibold))
+                                .foregroundColor(.white)
+                                .frame(width: 56, height: 56)
+                                .background(DS.ColorSet.brand)
+                                .clipShape(Circle())
+                                .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+                        }
+                    }
+                    .padding(.trailing, DS.Spacing.lg)
+                    .padding(.bottom, DS.Spacing.lg)
+                }
+            }
+        )
     }
 }
 

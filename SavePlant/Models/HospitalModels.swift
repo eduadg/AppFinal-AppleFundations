@@ -1,6 +1,73 @@
 import Foundation
 import UIKit
 
+// MARK: - Common Diseases
+public struct CommonDisease: Identifiable, Hashable {
+    public let id = UUID()
+    public let name: String
+    public let description: String
+    public let treatment: String
+    public let iconName: String
+    
+    public init(name: String, description: String, treatment: String, iconName: String) {
+        self.name = name
+        self.description = description
+        self.treatment = treatment
+        self.iconName = iconName
+    }
+    
+    public static let commonDiseases: [CommonDisease] = [
+        CommonDisease(
+            name: "Mancha Bacteriana",
+            description: "Manchas marrons ou pretas nas folhas, causadas por bactérias",
+            treatment: "Aplicar fungicida à base de cobre. Evitar molhar as folhas durante a rega. Melhorar ventilação entre as plantas.",
+            iconName: "circle.fill"
+        ),
+        CommonDisease(
+            name: "Míldio",
+            description: "Manchas amarelas nas folhas com crescimento branco na parte inferior",
+            treatment: "Aplicar fungicida sistêmico. Reduzir umidade. Melhorar circulação de ar.",
+            iconName: "cloud.rain.fill"
+        ),
+        CommonDisease(
+            name: "Oídio",
+            description: "Pó branco ou cinza nas folhas e caules",
+            treatment: "Aplicar fungicida específico para oídio. Reduzir umidade. Podar partes afetadas.",
+            iconName: "snowflake"
+        ),
+        CommonDisease(
+            name: "Ferrugem",
+            description: "Manchas laranja ou marrom nas folhas",
+            treatment: "Aplicar fungicida preventivo. Remover folhas infectadas. Melhorar ventilação.",
+            iconName: "flame.fill"
+        ),
+        CommonDisease(
+            name: "Podridão Radicular",
+            description: "Raízes marrons e moles, planta murcha",
+            treatment: "Reduzir rega. Melhorar drenagem do solo. Aplicar fungicida no solo.",
+            iconName: "root"
+        ),
+        CommonDisease(
+            name: "Vírus do Mosaico",
+            description: "Padrão de mosaico nas folhas, crescimento atrofiado",
+            treatment: "Remover plantas infectadas. Controlar insetos vetores. Usar sementes certificadas.",
+            iconName: "square.grid.3x3.fill"
+        ),
+        CommonDisease(
+            name: "Deficiência Nutricional",
+            description: "Folhas amarelas, crescimento lento",
+            treatment: "Aplicar fertilizante balanceado. Verificar pH do solo. Fazer análise do solo.",
+            iconName: "leaf.fill"
+        ),
+        CommonDisease(
+            name: "Outro",
+            description: "Outra condição ou doença não listada",
+            treatment: "Consulte um especialista para diagnóstico preciso e tratamento adequado.",
+            iconName: "questionmark.circle.fill"
+        )
+    ]
+}
+
 // MARK: - Plant Status
 public enum PlantStatus: String, CaseIterable {
     case inTreatment = "Em tratamento"
