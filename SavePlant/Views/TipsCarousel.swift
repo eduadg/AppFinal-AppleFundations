@@ -2,8 +2,7 @@ import SwiftUI
 
 public struct TipsCarousel: View {
     let items: [TipItem]
-    @State private var selectedTip: TipItem? = nil
-    @State private var showingTipModal = false
+    @State private var expandedCardIndex: Int? = nil
     
     public init(items: [TipItem]) {
         self.items = items
@@ -15,26 +14,24 @@ public struct TipsCarousel: View {
                 ForEach(Array(items.enumerated()), id: \.offset) { index, tip in
                     TipsCard(
                         tip: tip,
+                        isExpanded: expandedCardIndex == index,
                         onTap: {
-                            selectedTip = tip
-                            showingTipModal = true
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                expandedCardIndex = expandedCardIndex == index ? nil : index
+                            }
                         }
                     )
-                    .frame(width: 280)
+                    .frame(width: expandedCardIndex == index ? 320 : 280)
                 }
             }
             .padding(.horizontal, DS.Spacing.md)
-        }
-        .sheet(isPresented: $showingTipModal) {
-            if let tip = selectedTip {
-                TipDetailModal(tip: tip)
-            }
         }
     }
 }
 
 struct TipsCard: View {
     let tip: TipItem
+    let isExpanded: Bool
     let onTap: () -> Void
     
     var body: some View {
@@ -51,8 +48,8 @@ struct TipsCard: View {
                     
                     Spacer()
                     
-                    // Indicador para abrir modal
-                    Image(systemName: "arrow.up.right")
+                    // Indicador de expansão
+                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundColor(DS.ColorSet.textSecondary)
                 }
@@ -61,21 +58,24 @@ struct TipsCard: View {
                 Text(tip.title)
                     .font(.headline.weight(.semibold))
                     .foregroundColor(DS.ColorSet.textPrimary)
-                    .lineLimit(2)
+                    .lineLimit(isExpanded ? nil : 2)
                     .multilineTextAlignment(.leading)
                 
-                // Descrição truncada
+                // Descrição
                 Text(tip.description)
                     .font(.body)
                     .foregroundColor(DS.ColorSet.textSecondary)
-                    .lineLimit(3)
+                    .lineLimit(isExpanded ? nil : 3)
                     .multilineTextAlignment(.leading)
                 
-                Spacer(minLength: 8)
+                if !isExpanded {
+                    Spacer(minLength: 8)
+                }
             }
             .padding(DS.Spacing.md)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .frame(height: 120)
+            .frame(height: isExpanded ? nil : 120)
+            .frame(minHeight: 120)
             .background(Color.white)
             .cornerRadius(DS.Radius.lg)
             .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 4)
@@ -84,71 +84,4 @@ struct TipsCard: View {
     }
 }
 
-struct TipDetailModal: View {
-    let tip: TipItem
-    @Environment(\.dismiss) private var dismiss
-    
-    var body: some View {
-        VStack(spacing: 0) {
-            // Header customizado
-            HStack {
-                Text("Dica")
-                    .font(.headline.weight(.semibold))
-                    .foregroundColor(DS.ColorSet.textPrimary)
-                
-                Spacer()
-                
-                Button("Fechar") {
-                    dismiss()
-                }
-                .foregroundColor(DS.ColorSet.brand)
-                .font(.system(size: 16, weight: .medium))
-            }
-            .padding(DS.Spacing.md)
-            .background(Color(.systemBackground))
-            .overlay(
-                Rectangle()
-                    .fill(Color(.separator))
-                    .frame(height: 0.5),
-                alignment: .bottom
-            )
-            
-            // Conteúdo
-            ScrollView {
-                VStack(alignment: .leading, spacing: DS.Spacing.lg) {
-                    // Header com ícone
-                    HStack {
-                        Image(systemName: tip.icon)
-                            .font(.system(size: 32, weight: .bold))
-                            .foregroundColor(DS.ColorSet.brand)
-                            .frame(width: 48, height: 48)
-                            .background(DS.ColorSet.brandMuted)
-                            .cornerRadius(12)
-                        
-                        Spacer()
-                    }
-                    .padding(.top, DS.Spacing.md)
-                    
-                    // Título
-                    Text(tip.title)
-                        .font(.title2.weight(.bold))
-                        .foregroundColor(DS.ColorSet.textPrimary)
-                        .multilineTextAlignment(.leading)
-                    
-                    // Descrição completa
-                    Text(tip.description)
-                        .font(.body)
-                        .foregroundColor(DS.ColorSet.textSecondary)
-                        .multilineTextAlignment(.leading)
-                        .lineSpacing(4)
-                }
-                .padding(DS.Spacing.lg)
-                .frame(maxWidth: .infinity, alignment: .topLeading)
-            }
-            .background(Color(.systemBackground))
-        }
-        .background(Color(.systemBackground))
-        .presentationDetents([.large])
-        .presentationDragIndicator(.visible)
-    }
-}
+
