@@ -51,7 +51,7 @@ public struct HospitalView: View {
                             LazyVStack(spacing: DS.Spacing.md) {
                                 ForEach(hospitalData.plantsInTreatment) { plant in
                                     NavigationLink(destination: PlantDetailView(plant: plant)) {
-                                        PlantCard(plant: plant)
+                                        PlantCardRow(plantId: plant.id)
                                     }
                                     .buttonStyle(PlainButtonStyle())
                                 }
@@ -93,14 +93,19 @@ public struct HospitalView: View {
     }
 }
 
-struct PlantCard: View {
-    let plant: PlantInTreatment
+struct PlantCardRow: View {
+    let plantId: UUID
+    @StateObject private var hospitalData = HospitalDataManager.shared
+    
+    private var plant: PlantInTreatment? {
+        hospitalData.plantsInTreatment.first(where: { $0.id == plantId })
+    }
     
     var body: some View {
         HStack(spacing: DS.Spacing.md) {
             // Plant Photo
             Group {
-                if let photo = plant.latestPhoto {
+                if let photo = plant?.latestPhoto {
                     Image(uiImage: photo)
                         .resizable()
                         .scaledToFill()
@@ -118,7 +123,7 @@ struct PlantCard: View {
             // Plant Info
             VStack(alignment: .leading, spacing: DS.Spacing.xs) {
                 HStack {
-                    Text(plant.name)
+                    Text(plant?.name ?? "")
                         .font(.headline.weight(.semibold))
                         .foregroundColor(DS.ColorSet.textPrimary)
                     
@@ -126,24 +131,24 @@ struct PlantCard: View {
                     
                     // Status Badge
                     HStack(spacing: 4) {
-                        Image(systemName: plant.status.iconName)
+                        Image(systemName: (plant?.status ?? .inTreatment).iconName)
                             .font(.system(size: 12, weight: .medium))
                         
-                        Text(plant.status.rawValue)
+                        Text((plant?.status ?? .inTreatment).rawValue)
                             .font(.caption.weight(.medium))
                     }
-                    .foregroundColor(Color(plant.status.color))
+                    .foregroundColor(Color((plant?.status ?? .inTreatment).color))
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .background(Color(plant.status.color).opacity(0.1))
+                    .background(Color((plant?.status ?? .inTreatment).color).opacity(0.1))
                     .cornerRadius(12)
                 }
                 
-                Text(plant.disease)
+                Text(plant?.disease ?? "")
                     .font(.subheadline)
                     .foregroundColor(DS.ColorSet.textSecondary)
                 
-                Text("Última atualização: \(plant.lastUpdate.formatted(.dateTime.day().month(.abbreviated)))")
+                Text("Última atualização: \( (plant?.lastUpdate ?? Date()).formatted(.dateTime.day().month(.abbreviated)) )")
                     .font(.caption)
                     .foregroundColor(DS.ColorSet.textSecondary)
             }
