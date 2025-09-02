@@ -73,8 +73,8 @@ public struct PlantDetailView: View {
                         .foregroundColor(DS.ColorSet.textSecondary)
                 }
                 
-                // Status Update Section
-                StatusUpdateSection(plant: $plant)
+                // Status Update Section (lê e atualiza direto da store pelo ID)
+                StatusUpdateSection(plantId: plant.id)
                 
                 // Treatment Section
                 TreatmentSection(treatment: plant.treatment)
@@ -117,7 +117,7 @@ public struct PlantDetailView: View {
 }
 
 struct StatusUpdateSection: View {
-    @Binding var plant: PlantInTreatment
+    let plantId: UUID
     @StateObject private var hospitalData = HospitalDataManager.shared
     
     var body: some View {
@@ -130,8 +130,7 @@ struct StatusUpdateSection: View {
                 ForEach(PlantStatus.allCases, id: \.self) { status in
                     Button(action: {
                         withAnimation(.easeInOut(duration: 0.2)) {
-                            plant.updateStatus(status)
-                            hospitalData.updateStatus(for: plant.id, to: status)
+                            hospitalData.updateStatus(for: plantId, to: status)
                         }
                     }) {
                         HStack(spacing: DS.Spacing.xs) {
@@ -141,11 +140,11 @@ struct StatusUpdateSection: View {
                             Text(status.rawValue)
                                 .font(.caption.weight(.medium))
                         }
-                        .foregroundColor(plant.status == status ? .white : Color(status.color))
+                        .foregroundColor(currentStatus == status ? .white : Color(status.color))
                         .padding(.horizontal, DS.Spacing.sm)
                         .padding(.vertical, DS.Spacing.xs)
                         .frame(maxWidth: .infinity, minHeight: 44)
-                        .background(plant.status == status ? Color(status.color) : Color(status.color).opacity(0.1))
+                        .background(currentStatus == status ? Color(status.color) : Color(status.color).opacity(0.1))
                         .cornerRadius(DS.Radius.sm)
                     }
                 }
@@ -155,6 +154,10 @@ struct StatusUpdateSection: View {
         .background(Color.white)
         .cornerRadius(DS.Radius.lg)
         .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 4)
+    }
+
+    private var currentStatus: PlantStatus {
+        hospitalData.plantsInTreatment.first(where: { $0.id == plantId })?.status ?? .inTreatment
     }
 }
 
