@@ -65,15 +65,12 @@ extension PlantInTreatment {
             return PlantAnalysis(photo: image, date: analysis.date, notes: analysis.notes)
         }
         guard let latest = uiAnalyses.last?.photo else { return nil }
-        self = PlantInTreatment(name: stored.name, disease: stored.disease, status: stored.status, photo: latest, treatment: stored.treatment)
-        // Adjust dates
-        var mutable = self
-        mutable.lastUpdate = stored.lastUpdate
-        // Rebuild full analyses timeline
-        for a in uiAnalyses.dropFirst() {
-            mutable.addAnalysis(a)
-        }
-        self = mutable
+        var plant = PlantInTreatment(name: stored.name, disease: stored.disease, status: stored.status, photo: latest, treatment: stored.treatment)
+        plant.id = stored.id
+        plant.diagnosisDate = stored.diagnosisDate
+        plant.lastUpdate = stored.lastUpdate
+        for a in uiAnalyses.dropFirst() { plant.addAnalysis(a) }
+        self = plant
     }
 }
 

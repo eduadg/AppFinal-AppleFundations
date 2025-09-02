@@ -129,11 +129,11 @@ public struct PlantAnalysis: Identifiable, Equatable {
 
 // MARK: - Plant in Treatment
 public struct PlantInTreatment: Identifiable, Equatable {
-    public let id = UUID()
+    public var id = UUID()
     public let name: String
     public let disease: String
     public var status: PlantStatus
-    public let diagnosisDate: Date
+    public var diagnosisDate: Date
     public var lastUpdate: Date
     public var analyses: [PlantAnalysis]
     public let treatment: String
