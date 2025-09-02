@@ -246,9 +246,6 @@ struct AddPlantManuallyView: View {
                 }
             }
         }
-        .sheet(isPresented: $showingImagePicker) {
-            ImagePicker(selectedImage: $selectedPhoto)
-        }
         .sheet(isPresented: $showingDiseasePicker) {
             DiseasePickerView(selectedDisease: $selectedDisease)
         }

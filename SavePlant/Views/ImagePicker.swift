@@ -86,12 +86,16 @@ struct ImagePickerActionSheet: View {
         .buttonStyle(PlainButtonStyle())
         .confirmationDialog("Selecionar Foto", isPresented: $showingActionSheet) {
             Button("Câmera") {
-                sourceType = .camera
-                showingImagePicker = true
+                DispatchQueue.main.async {
+                    sourceType = .camera
+                    showingImagePicker = true
+                }
             }
             Button("Galeria") {
-                sourceType = .photoLibrary
-                showingImagePicker = true
+                DispatchQueue.main.async {
+                    sourceType = .photoLibrary
+                    showingImagePicker = true
+                }
             }
             Button("Cancelar", role: .cancel) { }
         }
