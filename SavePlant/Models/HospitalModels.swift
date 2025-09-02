@@ -200,6 +200,13 @@ public class HospitalDataManager: ObservableObject {
             saveToStorage()
         }
     }
+
+    public func updateStatus(for plantId: UUID, to status: PlantStatus) {
+        if let idx = plantsInTreatment.firstIndex(where: { $0.id == plantId }) {
+            plantsInTreatment[idx].updateStatus(status)
+            saveToStorage()
+        }
+    }
     
     public func removePlant(withId id: UUID) {
         plantsInTreatment.removeAll { $0.id == id }

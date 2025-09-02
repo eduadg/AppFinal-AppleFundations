@@ -15,15 +15,13 @@ public struct PlantDetailView: View {
             VStack(alignment: .leading, spacing: DS.Spacing.lg) {
                 // Main Photo Section
                 if let latestPhoto = plant.latestPhoto {
-                    GeometryReader { geo in
-                        Image(uiImage: latestPhoto)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: geo.size.width, height: 300)
-                            .clipped()
-                            .cornerRadius(DS.Radius.lg)
-                    }
-                    .frame(height: 300)
+                    Image(uiImage: latestPhoto)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 260)
+                        .clipShape(RoundedRectangle(cornerRadius: DS.Radius.lg))
+                        .contentShape(RoundedRectangle(cornerRadius: DS.Radius.lg))
                 } else {
                     RoundedRectangle(cornerRadius: DS.Radius.lg)
                         .fill(Color(.systemGray6))
@@ -110,6 +108,11 @@ public struct PlantDetailView: View {
         .sheet(isPresented: $showingAddPhoto) {
             AddPhotoView(plant: $plant)
         }
+        .onReceive(hospitalData.$plantsInTreatment) { list in
+            if let updated = list.first(where: { $0.id == plant.id }) {
+                plant = updated
+            }
+        }
     }
 }
 
@@ -127,10 +130,8 @@ struct StatusUpdateSection: View {
                 ForEach(PlantStatus.allCases, id: \.self) { status in
                     Button(action: {
                         withAnimation(.easeInOut(duration: 0.2)) {
-                            var updatedPlant = plant
-                            updatedPlant.updateStatus(status)
-                            plant = updatedPlant
-                            hospitalData.updatePlant(updatedPlant)
+                            plant.updateStatus(status)
+                            hospitalData.updateStatus(for: plant.id, to: status)
                         }
                     }) {
                         HStack(spacing: DS.Spacing.xs) {

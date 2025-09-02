@@ -77,7 +77,9 @@ extension PlantInTreatment {
 extension StoredPlant {
     static func from(_ plant: PlantInTreatment) -> StoredPlant {
         let analyses: [StoredAnalysis] = plant.timeline.map { analysis in
-            let data = analysis.photo.jpegData(compressionQuality: 0.9) ?? Data()
+            // Normaliza orientação e reduz tamanho para persistência consistente
+            let normalized = analysis.photo.fixOrientation()
+            let data = normalized.jpegData(compressionQuality: 0.9) ?? Data()
             return StoredAnalysis(photoData: data, date: analysis.date, notes: analysis.notes)
         }
         return StoredPlant(
@@ -90,6 +92,18 @@ extension StoredPlant {
             treatment: plant.treatment,
             analyses: analyses
         )
+    }
+}
+
+// MARK: - UIImage helpers
+private extension UIImage {
+    func fixOrientation() -> UIImage {
+        if imageOrientation == .up { return self }
+        UIGraphicsBeginImageContextWithOptions(size, false, scale)
+        draw(in: CGRect(origin: .zero, size: size))
+        let normalized = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return normalized ?? self
     }
 }
 
