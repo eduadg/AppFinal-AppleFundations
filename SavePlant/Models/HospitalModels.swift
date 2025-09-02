@@ -1,5 +1,6 @@
 import Foundation
 import UIKit
+import SwiftData
 
 // MARK: - Common Diseases
 public struct CommonDisease: Identifiable, Hashable {
@@ -177,28 +178,59 @@ public class HospitalDataManager: ObservableObject {
     @Published public var plantsInTreatment: [PlantInTreatment] = []
     
     public static let shared = HospitalDataManager()
+    private var context: ModelContext?
     
     private init() {
-        loadMockData()
+        // aguardará contexto ser injetado pelo App
+    }
+    
+    public func setContext(_ context: ModelContext) {
+        self.context = context
+        loadFromStorage()
     }
     
     public func addPlant(_ plant: PlantInTreatment) {
         plantsInTreatment.append(plant)
+        saveToStorage()
     }
     
     public func updatePlant(_ plant: PlantInTreatment) {
         if let index = plantsInTreatment.firstIndex(where: { $0.id == plant.id }) {
             plantsInTreatment[index] = plant
+            saveToStorage()
         }
     }
     
     public func removePlant(withId id: UUID) {
         plantsInTreatment.removeAll { $0.id == id }
+        saveToStorage()
     }
     
     // MARK: - Mock Data
-    private func loadMockData() {
-        // Hospital inicia vazio - plantas serão adicionadas manualmente pelo usuário
-        // plantsInTreatment inicia como array vazio
+    // MARK: - SwiftData Persistence
+    private func loadFromStorage() {
+        guard let context = context else { return }
+        do {
+            let stored: [StoredPlant] = try context.fetch(FetchDescriptor<StoredPlant>())
+            let mapped: [PlantInTreatment] = stored.compactMap { PlantInTreatment(stored: $0) }
+            self.plantsInTreatment = mapped
+        } catch {
+            self.plantsInTreatment = []
+        }
+    }
+    
+    private func saveToStorage() {
+        guard let context = context else { return }
+        do {
+            // Limpa e regrava tudo (simples e seguro aqui)
+            let existing: [StoredPlant] = try context.fetch(FetchDescriptor<StoredPlant>())
+            for item in existing { context.delete(item) }
+            for plant in plantsInTreatment {
+                context.insert(StoredPlant.from(plant))
+            }
+            try context.save()
+        } catch {
+            // Em produção, tratar erro
+        }
     }
 }

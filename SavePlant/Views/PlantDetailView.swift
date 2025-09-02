@@ -15,12 +15,15 @@ public struct PlantDetailView: View {
             VStack(alignment: .leading, spacing: DS.Spacing.lg) {
                 // Main Photo Section
                 if let latestPhoto = plant.latestPhoto {
-                    Image(uiImage: latestPhoto)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(height: 300)
-                        .clipped()
-                        .cornerRadius(DS.Radius.lg)
+                    GeometryReader { geo in
+                        Image(uiImage: latestPhoto)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: geo.size.width, height: 300)
+                            .clipped()
+                            .cornerRadius(DS.Radius.lg)
+                    }
+                    .frame(height: 300)
                 } else {
                     RoundedRectangle(cornerRadius: DS.Radius.lg)
                         .fill(Color(.systemGray6))
