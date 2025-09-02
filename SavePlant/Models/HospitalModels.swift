@@ -76,6 +76,9 @@ public enum PlantStatus: String, CaseIterable {
     case worsening = "Piorando"
     case stable = "Estável"
     case improving = "Melhorando"
+
+    // Removemos "Estável" da listagem exibida ao usuário
+    public static var allCases: [PlantStatus] { [.inTreatment, .cured, .worsening, .improving] }
     
     var color: UIColor {
         switch self {

@@ -3,6 +3,7 @@ import SwiftUI
 public struct HomeView: View {
     @State private var search = ""
     @State private var showingScanView = false
+    @EnvironmentObject private var router: AppRouter
 
     private let tipsData: [TipItem] = [
         .init(title: "Evite molhar folhas à noite", description: "A umidade noturna favorece o desenvolvimento de fungos", icon: "moon.stars.fill"),
@@ -135,8 +136,7 @@ public struct HomeView: View {
                             HStack(spacing: DS.Spacing.md) {
                                 // Card B - Hospital
                                 Button(action: {
-                                    // Navegação para Hospital será feita via TabView
-                                    // Por enquanto, mostra uma mensagem informativa
+                                    router.selectedTab = 1
                                 }) {
                                     VStack {
                                         HStack {
@@ -153,7 +153,7 @@ public struct HomeView: View {
                                             Text("Hospital")
                                                 .font(.headline.weight(.bold))
                                                 .foregroundColor(.white)
-                                            Text("0 em tratamento")
+                                            Text("\(HospitalDataManager.shared.plantsInTreatment.filter { $0.status == .inTreatment }.count) em tratamento")
                                                 .font(.caption)
                                                 .foregroundColor(.white.opacity(0.8))
                                         }

@@ -8,9 +8,11 @@ struct SavePlantApp: App {
         let config = ModelConfiguration(isStoredInMemoryOnly: false)
         return try! ModelContainer(for: schema, configurations: [config])
     }()
+    @StateObject private var router = AppRouter()
     var body: some Scene {
         WindowGroup {
-            RootTabView()   // <<< GARANTE que inicia na tela certa
+            RootTabView()
+                .environmentObject(router)
                 .onAppear {
                     // Injeta o contexto SwiftData no manager
                     if let context = container.mainContext as ModelContext? {
