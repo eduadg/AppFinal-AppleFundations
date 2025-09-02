@@ -55,16 +55,16 @@ public struct PlantDetailView: View {
                         
                         // Status Indicator
                         VStack(spacing: DS.Spacing.xs) {
-                            Image(systemName: plant.status.iconName)
+                            Image(systemName: currentHeaderStatus.iconName)
                                 .font(.system(size: 24, weight: .semibold))
-                                .foregroundColor(Color(plant.status.color))
+                                .foregroundColor(Color(currentHeaderStatus.color))
                             
-                            Text(plant.status.rawValue)
+                            Text(currentHeaderStatus.rawValue)
                                 .font(.caption.weight(.medium))
-                                .foregroundColor(Color(plant.status.color))
+                                .foregroundColor(Color(currentHeaderStatus.color))
                         }
                         .padding(DS.Spacing.md)
-                        .background(Color(plant.status.color).opacity(0.1))
+                        .background(Color(currentHeaderStatus.color).opacity(0.1))
                         .cornerRadius(DS.Radius.md)
                     }
                     
@@ -113,6 +113,12 @@ public struct PlantDetailView: View {
                 plant = updated
             }
         }
+    }
+}
+
+private extension PlantDetailView {
+    var currentHeaderStatus: PlantStatus {
+        hospitalData.plantsInTreatment.first(where: { $0.id == plant.id })?.status ?? plant.status
     }
 }
 

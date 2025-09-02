@@ -203,7 +203,9 @@ public class HospitalDataManager: ObservableObject {
 
     public func updateStatus(for plantId: UUID, to status: PlantStatus) {
         if let idx = plantsInTreatment.firstIndex(where: { $0.id == plantId }) {
-            plantsInTreatment[idx].updateStatus(status)
+            var updated = plantsInTreatment[idx]
+            updated.updateStatus(status)
+            plantsInTreatment[idx] = updated   // reatribui para disparar @Published
             saveToStorage()
         }
     }
