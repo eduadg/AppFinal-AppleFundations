@@ -116,11 +116,33 @@ public struct PlantDetailView: View {
         }
         .onChange(of: newPhoto) { _, img in
             guard let img = img else { return }
-            // adiciona nova análise e atualiza no store
+            
+            print("🔄 Adicionando nova foto à planta: \(plant.name)")
+            
+            // Cria nova análise com a foto
+            let newAnalysis = PlantAnalysis(photo: img, date: Date())
+            
+            // Atualiza a planta localmente
             var updated = plant
-            updated.addAnalysis(PlantAnalysis(photo: img))
+            updated.addAnalysis(newAnalysis)
+            
+            print("📸 Total de análises após adicionar: \(updated.analyses.count)")
+            print("🎯 Foto mais recente mudou: \(updated.latestPhoto != nil)")
+            
+            // Atualiza no store
             hospitalData.updatePlant(updated)
-            plant = updated
+            
+            // Atualiza estado local e força refresh da interface
+            DispatchQueue.main.async {
+                self.plant = updated
+                
+                // Reset do estado da foto para permitir nova seleção
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.newPhoto = nil
+                }
+            }
+            
+            print("✅ Nova foto adicionada com sucesso")
         }
         .fullScreenCover(isPresented: $showingGallery) {
             PhotoPagerView(analyses: plant.timeline, currentIndex: $galleryIndex)
@@ -236,7 +258,7 @@ struct TimelineSection: View {
                         Button(action: { onSelectIndex(index) }) {
                             TimelineItem(
                                 analysis: analysis,
-                                isLatest: index == analyses.count - 1
+                                isLatest: index == 0  // Primeira da lista ordenada por data decrescente
                             )
                         }
                         .buttonStyle(PlainButtonStyle())
@@ -280,9 +302,21 @@ struct TimelineItem: View {
             
             // Date and notes
             VStack(alignment: .leading, spacing: DS.Spacing.xs) {
-                Text(analysis.date.formatted(.dateTime.day().month(.abbreviated).hour().minute()))
-                    .font(.subheadline.weight(.medium))
-                    .foregroundColor(DS.ColorSet.textPrimary)
+                HStack {
+                    Text(analysis.date.formatted(.dateTime.day().month(.abbreviated).hour().minute()))
+                        .font(.subheadline.weight(.medium))
+                        .foregroundColor(DS.ColorSet.textPrimary)
+                    
+                    if isLatest {
+                        Text("ATUAL")
+                            .font(.caption2.weight(.bold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(DS.ColorSet.brand)
+                            .cornerRadius(4)
+                    }
+                }
                 
                 if let notes = analysis.notes, !notes.isEmpty {
                     Text(notes)

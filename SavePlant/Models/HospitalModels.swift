@@ -147,7 +147,7 @@ public struct PlantInTreatment: Identifiable, Equatable {
     }
     
     public var timeline: [PlantAnalysis] {
-        analyses.sorted { $0.date < $1.date }
+        analyses.sorted { $0.date > $1.date }
     }
     
     public init(name: String, disease: String, status: PlantStatus = .inTreatment, photo: UIImage, treatment: String) {
