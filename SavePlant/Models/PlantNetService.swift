@@ -48,7 +48,10 @@ public final class PlantNetService: ObservableObject {
 
         var components = URLComponents(string: baseURL)!
         components.queryItems = [
-            URLQueryItem(name: "api-key", value: apiKey)
+            URLQueryItem(name: "api-key", value: apiKey),
+            URLQueryItem(name: "include-related-images", value: "false"),
+            URLQueryItem(name: "no-reject", value: "false"),
+            URLQueryItem(name: "lang", value: "pt")
         ]
 
         guard let url = components.url else {
@@ -58,6 +61,8 @@ public final class PlantNetService: ObservableObject {
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
+        // Também envia a chave no header por redundância (alguns proxies exigem)
+        request.setValue(apiKey, forHTTPHeaderField: "Api-Key")
 
         // multipart/form-data
         let boundary = "Boundary-\(UUID().uuidString)"
@@ -83,7 +88,12 @@ public final class PlantNetService: ObservableObject {
                 }
 
                 if let http = response as? HTTPURLResponse, http.statusCode != 200 {
-                    completion(.failure(PlantIdentificationError.apiError("PlantNet HTTP \(http.statusCode)")))
+                    var details: String = ""
+                    if let data = data, let text = String(data: data, encoding: .utf8) {
+                        details = " - \(text)"
+                        print("PlantNet error body:\n\(text)")
+                    }
+                    completion(.failure(PlantIdentificationError.apiError("PlantNet HTTP \(http.statusCode)\(details)")))
                     return
                 }
 
