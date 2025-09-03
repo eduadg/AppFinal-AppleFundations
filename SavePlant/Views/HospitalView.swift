@@ -177,6 +177,10 @@ struct AddPlantManuallyView: View {
     @State private var showingDiseasePicker = false
     @State private var showingCustomDisease = false
     
+    // Estados para classificação automática
+    @State private var isPredicting = false
+    @State private var lastConfidence: Double = 0
+    
     private var isFormValid: Bool {
         !plantName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         (selectedDisease != nil || (!customDisease.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !customTreatment.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)) &&
@@ -203,7 +207,9 @@ struct AddPlantManuallyView: View {
                         // Photo Section
                         PhotoSection(
                             selectedPhoto: $selectedPhoto,
-                            showingImagePicker: $showingImagePicker
+                            showingImagePicker: $showingImagePicker,
+                            isPredicting: isPredicting,
+                            lastConfidence: lastConfidence
                         )
                         
                         // Plant Name Section
@@ -255,6 +261,40 @@ struct AddPlantManuallyView: View {
                 customTreatment: $customTreatment
             )
         }
+        .onChange(of: selectedPhoto) { newImage in
+            guard let img = newImage, !isPredicting,
+                  let classifier = PlantDiseaseClassifier.shared else { return }
+            isPredicting = true
+            classifier.classify(img) { pred in
+                DispatchQueue.main.async {
+                    self.isPredicting = false
+                    guard let pred = pred else { return }
+
+                    // Preenche automaticamente os campos do formulário
+                    if self.plantName.isEmpty, !pred.plant.isEmpty {
+                        self.plantName = pred.plant
+                    }
+
+                    // Tenta casar com suas doenças comuns; se não houver, usa personalizado
+                    if let match = self.tryMatchCommonDisease(named: pred.disease) {
+                        self.selectedDisease = match
+                        self.customDisease = ""
+                        self.customTreatment = ""
+                    } else {
+                        self.selectedDisease = nil
+                        self.customDisease = pred.disease
+                        // TODO: se quiser, preencha tratamento padrão aqui
+                    }
+
+                    self.notes = self.notes.isEmpty
+                        ? String(format: "Confiança do modelo: %.0f%%", pred.confidence * 100)
+                        : self.notes
+                    
+                    // Atualiza a confiança para mostrar na UI
+                    self.lastConfidence = pred.confidence
+                }
+            }
+        }
     }
     
     private func savePlant() {
@@ -293,12 +333,25 @@ struct AddPlantManuallyView: View {
         
         dismiss()
     }
+    
+    // Helper para tentar casar a doença reconhecida com a lista de doenças comuns
+    private func tryMatchCommonDisease(named name: String) -> CommonDisease? {
+        let key = name.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Busca por correspondência exata ou parcial nas doenças comuns
+        return CommonDisease.commonDiseases.first { disease in
+            let diseaseName = disease.name.lowercased()
+            return diseaseName.contains(key) || key.contains(diseaseName)
+        }
+    }
 }
 
 // MARK: - Photo Section
 struct PhotoSection: View {
     @Binding var selectedPhoto: UIImage?
     @Binding var showingImagePicker: Bool
+    let isPredicting: Bool
+    let lastConfidence: Double
     
     var body: some View {
         VStack(spacing: DS.Spacing.md) {
@@ -311,6 +364,33 @@ struct PhotoSection: View {
                 selectedImage: $selectedPhoto,
                 showingImagePicker: $showingImagePicker
             )
+            
+            // Indicador de classificação em andamento
+            if isPredicting {
+                HStack(spacing: DS.Spacing.sm) {
+                    ProgressView()
+                        .scaleEffect(0.8)
+                    
+                    Text("Analisando imagem...")
+                        .font(.caption)
+                        .foregroundColor(DS.ColorSet.textSecondary)
+                }
+                .padding(.top, DS.Spacing.sm)
+            }
+            
+            // Mensagem de sucesso quando a classificação for concluída
+            if !isPredicting && selectedPhoto != nil && lastConfidence > 0 {
+                HStack(spacing: DS.Spacing.sm) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.green)
+                        .font(.caption)
+                    
+                    Text("Análise concluída com \(Int(lastConfidence * 100))% de confiança")
+                        .font(.caption)
+                        .foregroundColor(.green)
+                }
+                .padding(.top, DS.Spacing.sm)
+            }
         }
         .padding(DS.Spacing.md)
         .background(Color.white)
