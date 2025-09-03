@@ -3,13 +3,18 @@ import UIKit
 
 // MARK: - Plant Identification Models
 public struct PlantIdentificationResult: Codable {
-    let result: PlantResult
-    let status: String
-    let message: String
+    let result: PlantResult?
+    let status: String?
+    let message: String?
+    
+    // Campos opcionais para compatibilidade com diferentes versões da API
+    let classification: [PlantClassification]?
+    let images: [PlantImage]?
+    let plantDetails: PlantDetails?
     
     struct PlantResult: Codable {
-        let classification: [PlantClassification]
-        let images: [PlantImage]
+        let classification: [PlantClassification]?
+        let images: [PlantImage]?
         let plantDetails: PlantDetails?
         
         enum CodingKeys: String, CodingKey {
@@ -17,6 +22,16 @@ public struct PlantIdentificationResult: Codable {
             case images
             case plantDetails = "plant_details"
         }
+    }
+    
+    // Coding keys para compatibilidade com diferentes formatos
+    enum CodingKeys: String, CodingKey {
+        case result
+        case status
+        case message
+        case classification
+        case images
+        case plantDetails = "plant_details"
     }
 }
 
@@ -167,16 +182,41 @@ public class PlantIdentificationService: ObservableObject {
                     return
                 }
                 
+                // Verificar status HTTP
+                if let httpResponse = response as? HTTPURLResponse {
+                    print("HTTP Status: \(httpResponse.statusCode)")
+                    
+                    if httpResponse.statusCode != 200 {
+                        let errorMessage = "Erro da API: Status \(httpResponse.statusCode)"
+                        completion(.failure(PlantIdentificationError.apiError(errorMessage)))
+                        return
+                    }
+                }
+                
                 guard let data = data else {
                     completion(.failure(PlantIdentificationError.noData))
                     return
                 }
                 
                 do {
+                    // Debug: imprimir resposta da API para entender o formato
+                    if let jsonString = String(data: data, encoding: .utf8) {
+                        print("API Response: \(jsonString)")
+                    }
+                    
                     let result = try JSONDecoder().decode(PlantIdentificationResult.self, from: data)
                     completion(.success(result))
                 } catch {
-                    completion(.failure(PlantIdentificationError.decodingError(error)))
+                    print("Decoding error: \(error)")
+                    print("Response data: \(String(data: data, encoding: .utf8) ?? "Unable to convert to string")")
+                    
+                    // Tentar decodificar como erro da API
+                    if let errorResponse = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                       let errorMessage = errorResponse["message"] as? String {
+                        completion(.failure(PlantIdentificationError.apiError(errorMessage)))
+                    } else {
+                        completion(.failure(PlantIdentificationError.decodingError(error)))
+                    }
                 }
             }
         }.resume()
@@ -213,15 +253,32 @@ public struct PlantInfo {
     let confidence: Double
     
     init(from result: PlantIdentificationResult) {
-        if let firstClassification = result.result.classification.first {
-            self.name = firstClassification.name
-            self.confidence = firstClassification.probability
+        // Tentar obter classificação de diferentes locais
+        var classification: PlantClassification?
+        
+        if let firstClassification = result.classification?.first {
+            classification = firstClassification
+        } else if let firstClassification = result.result?.classification?.first {
+            classification = firstClassification
+        }
+        
+        if let classification = classification {
+            self.name = classification.name
+            self.confidence = classification.probability
         } else {
             self.name = "Planta não identificada"
             self.confidence = 0.0
         }
         
-        if let details = result.result.plantDetails {
+        // Tentar obter detalhes de diferentes locais
+        var details: PlantDetails?
+        if let plantDetails = result.plantDetails {
+            details = plantDetails
+        } else if let plantDetails = result.result?.plantDetails {
+            details = plantDetails
+        }
+        
+        if let details = details {
             self.scientificName = details.scientificName
             self.family = details.family
             self.commonNames = details.commonNames ?? []

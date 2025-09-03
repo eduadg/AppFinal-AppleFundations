@@ -275,15 +275,15 @@ struct AddPlantManuallyView: View {
         } message: {
             Text(plantIdentificationError ?? "Erro desconhecido na identificação da planta")
         }
-        .onChange(of: selectedPhoto) { newImage in
-            guard let img = newImage else { return }
+        .onChange(of: selectedPhoto) { oldValue, newValue in
+            guard let newImage = newValue else { return }
             
             // Identificar a planta primeiro
-            identifyPlant(img)
+            identifyPlant(newImage)
             
             // Depois classificar a doença (se o classificador estiver disponível)
             if let classifier = PlantDiseaseClassifier.shared {
-                classifyDisease(img, using: classifier)
+                classifyDisease(newImage, using: classifier)
             }
         }
     }
