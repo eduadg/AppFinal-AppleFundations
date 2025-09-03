@@ -46,19 +46,22 @@ public struct HospitalView: View {
                             Spacer()
                         }
                     } else {
-                        // Plants List
-                        ScrollView {
-                            LazyVStack(spacing: DS.Spacing.md) {
-                                ForEach(hospitalData.plantsInTreatment) { plant in
-                                    NavigationLink(destination: PlantDetailView(plant: plant)) {
-                                        PlantCardRow(plantId: plant.id)
+                        // Plants List com swipe-to-delete
+                        List {
+                            ForEach(hospitalData.plantsInTreatment) { plant in
+                                NavigationLink(destination: PlantDetailView(plant: plant)) {
+                                    PlantCardRow(plantId: plant.id)
+                                }
+                                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                    Button(role: .destructive) {
+                                        hospitalData.removePlant(withId: plant.id)
+                                    } label: {
+                                        Label("Excluir", systemImage: "trash")
                                     }
-                                    .buttonStyle(PlainButtonStyle())
                                 }
                             }
-                            .padding(.horizontal, DS.Spacing.md)
-                            .padding(.vertical, DS.Spacing.sm)
                         }
+                        .listStyle(.plain)
                     }
                 }
             }
@@ -596,6 +599,7 @@ struct PlantNameSection: View {
 struct SuggestedDiseasesSection: View {
     @Binding var plantName: String
     var onSelectDisease: (CommonDisease) -> Void
+    @State private var selected: CommonDisease?
     
     private var suggestions: [CommonDisease] {
         PlantDiseaseKnowledgeBase.suggestDiseases(for: plantName)
@@ -614,6 +618,31 @@ struct SuggestedDiseasesSection: View {
                         .font(.caption)
                         .foregroundColor(DS.ColorSet.textSecondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
+                } else if let selected = selected {
+                    // Mostra somente a doença escolhida e botão alterar
+                    HStack(alignment: .top, spacing: DS.Spacing.sm) {
+                        Image(systemName: selected.iconName)
+                            .foregroundColor(DS.ColorSet.brand)
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(selected.name)
+                                .font(.subheadline.weight(.medium))
+                                .foregroundColor(DS.ColorSet.textPrimary)
+                            Text(selected.description)
+                                .font(.caption)
+                                .foregroundColor(DS.ColorSet.textSecondary)
+                                .lineLimit(3)
+                            Text("Tratamento: \(selected.treatment)")
+                                .font(.caption2)
+                                .foregroundColor(DS.ColorSet.textSecondary)
+                        }
+                        Spacer()
+                        Button("Alterar") { self.selected = nil }
+                            .font(.caption.weight(.semibold))
+                            .foregroundColor(DS.ColorSet.brand)
+                    }
+                    .padding(DS.Spacing.sm)
+                    .background(DS.ColorSet.brandMuted.opacity(0.15))
+                    .cornerRadius(DS.Radius.sm)
                 } else {
                     VStack(spacing: DS.Spacing.sm) {
                         ForEach(suggestions, id: \.id) { disease in
@@ -648,6 +677,10 @@ struct SuggestedDiseasesSection: View {
                                 .cornerRadius(DS.Radius.sm)
                             }
                             .buttonStyle(PlainButtonStyle())
+                            .onTapGesture {
+                                self.selected = disease
+                                onSelectDisease(disease)
+                            }
                         }
                     }
                 }

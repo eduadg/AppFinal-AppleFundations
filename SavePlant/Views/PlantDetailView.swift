@@ -3,6 +3,7 @@ import SwiftUI
 public struct PlantDetailView: View {
     @State private var plant: PlantInTreatment
     @State private var showingAddPhoto = false
+    @State private var newPhoto: UIImage?
     @StateObject private var hospitalData = HospitalDataManager.shared
     @Environment(\.dismiss) private var dismiss
     
@@ -106,7 +107,15 @@ public struct PlantDetailView: View {
         .navigationTitle("Detalhes da Planta")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingAddPhoto) {
-            AddPhotoView(plant: $plant)
+            ImagePicker(selectedImage: $newPhoto, sourceType: .photoLibrary)
+        }
+        .onChange(of: newPhoto) { _, img in
+            guard let img = img else { return }
+            // adiciona nova análise e atualiza no store
+            var updated = plant
+            updated.addAnalysis(PlantAnalysis(photo: img))
+            hospitalData.updatePlant(updated)
+            plant = updated
         }
         .onReceive(hospitalData.$plantsInTreatment) { list in
             if let updated = list.first(where: { $0.id == plant.id }) {
