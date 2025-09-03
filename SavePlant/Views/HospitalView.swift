@@ -222,8 +222,13 @@ struct AddPlantManuallyView: View {
                             plantIdentificationResult: plantIdentificationResult
                         )
                         
-                        // Plant Name Section
+                        // Plant Name Section + sugestões
                         PlantNameSection(plantName: $plantName)
+                        SuggestedDiseasesSection(plantName: $plantName, onSelectDisease: { disease in
+                            self.selectedDisease = disease
+                            self.customDisease = ""
+                            self.customTreatment = ""
+                        })
                         
                         // Disease Selection Section
                         DiseaseSelectionSection(
@@ -578,6 +583,70 @@ struct PlantNameSection: View {
         .background(Color.white)
         .cornerRadius(DS.Radius.lg)
         .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 4)
+    }
+}
+
+// MARK: - Suggested Diseases Section (by Plant Name)
+struct SuggestedDiseasesSection: View {
+    @Binding var plantName: String
+    var onSelectDisease: (CommonDisease) -> Void
+    
+    private var suggestions: [CommonDisease] {
+        PlantDiseaseKnowledgeBase.suggestDiseases(for: plantName)
+    }
+    
+    var body: some View {
+        if !plantName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            VStack(spacing: DS.Spacing.md) {
+                Text("Sugestões de Doenças para \(plantName)")
+                    .font(.headline.weight(.semibold))
+                    .foregroundColor(DS.ColorSet.textPrimary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                if suggestions.isEmpty {
+                    Text("Nenhuma sugestão encontrada para este nome.")
+                        .font(.caption)
+                        .foregroundColor(DS.ColorSet.textSecondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                } else {
+                    VStack(spacing: DS.Spacing.sm) {
+                        ForEach(suggestions, id: \.id) { disease in
+                            Button(action: { onSelectDisease(disease) }) {
+                                HStack {
+                                    Image(systemName: disease.iconName)
+                                        .foregroundColor(DS.ColorSet.brand)
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(disease.name)
+                                            .font(.subheadline.weight(.medium))
+                                            .foregroundColor(DS.ColorSet.textPrimary)
+                                        Text(disease.description)
+                                            .font(.caption)
+                                            .foregroundColor(DS.ColorSet.textSecondary)
+                                            .lineLimit(2)
+                                    }
+                                    Spacer()
+                                    Text("Selecionar")
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 6)
+                                        .background(DS.ColorSet.brand)
+                                        .cornerRadius(8)
+                                }
+                                .padding(DS.Spacing.sm)
+                                .background(DS.ColorSet.brandMuted.opacity(0.15))
+                                .cornerRadius(DS.Radius.sm)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                    }
+                }
+            }
+            .padding(DS.Spacing.md)
+            .background(Color.white)
+            .cornerRadius(DS.Radius.lg)
+            .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 4)
+        }
     }
 }
 
