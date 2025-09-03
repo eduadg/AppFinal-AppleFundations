@@ -313,3 +313,14 @@ public struct PlantInfo {
         }
     }
 }
+
+// Permite criar PlantInfo diretamente a partir de campos (usado pelo PlantNetService)
+public extension PlantInfo {
+    init(name: String, scientificName: String?, family: String?, commonNames: [String], confidence: Double) {
+        self.name = name
+        self.scientificName = scientificName
+        self.family = family
+        self.commonNames = commonNames
+        self.confidence = confidence
+    }
+}
