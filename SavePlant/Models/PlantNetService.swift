@@ -29,7 +29,7 @@ public final class PlantNetService: ObservableObject {
 
     // Preencha com sua chave da PlantNet. Requer cadastro em my.plantnet.org
     // Se vazio, o serviço usará um fallback local (mock) para não quebrar o fluxo.
-    private let apiKey: String = "" // TODO: inserir chave PlantNet aqui
+    private let apiKey: String = "2b10HWXqKAQtm0YfAYGNGjcmA" // chave PlantNet
     private let baseURL: String = "https://my-api.plantnet.org/v2/identify/all"
 
     private init() {}
