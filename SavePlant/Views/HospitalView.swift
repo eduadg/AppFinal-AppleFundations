@@ -154,6 +154,7 @@ struct PlantCardRow: View {
             }
             
             Spacer()
+            
         }
         .padding(DS.Spacing.md)
         .background(Color.white)
@@ -180,6 +181,12 @@ struct AddPlantManuallyView: View {
     // Estados para classificação automática
     @State private var isPredicting = false
     @State private var lastConfidence: Double = 0
+    
+    // Estados para identificação de planta
+    @State private var isIdentifyingPlant = false
+    @State private var plantIdentificationResult: PlantInfo?
+    @State private var showingPlantIdentificationAlert = false
+    @State private var plantIdentificationError: String?
     
     private var isFormValid: Bool {
         !plantName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
@@ -209,7 +216,9 @@ struct AddPlantManuallyView: View {
                             selectedPhoto: $selectedPhoto,
                             showingImagePicker: $showingImagePicker,
                             isPredicting: isPredicting,
-                            lastConfidence: lastConfidence
+                            lastConfidence: lastConfidence,
+                            isIdentifyingPlant: isIdentifyingPlant,
+                            plantIdentificationResult: plantIdentificationResult
                         )
                         
                         // Plant Name Section
@@ -261,38 +270,88 @@ struct AddPlantManuallyView: View {
                 customTreatment: $customTreatment
             )
         }
+        .alert("Erro na Identificação", isPresented: $showingPlantIdentificationAlert) {
+            Button("OK") { }
+        } message: {
+            Text(plantIdentificationError ?? "Erro desconhecido na identificação da planta")
+        }
         .onChange(of: selectedPhoto) { newImage in
-            guard let img = newImage, !isPredicting,
-                  let classifier = PlantDiseaseClassifier.shared else { return }
-            isPredicting = true
-            classifier.classify(img) { pred in
-                DispatchQueue.main.async {
-                    self.isPredicting = false
-                    guard let pred = pred else { return }
-
-                    // Preenche automaticamente os campos do formulário
-                    if self.plantName.isEmpty, !pred.plant.isEmpty {
-                        self.plantName = pred.plant
-                    }
-
-                    // Tenta casar com suas doenças comuns; se não houver, usa personalizado
-                    if let match = self.tryMatchCommonDisease(named: pred.disease) {
-                        self.selectedDisease = match
-                        self.customDisease = ""
-                        self.customTreatment = ""
-                    } else {
-                        self.selectedDisease = nil
-                        self.customDisease = pred.disease
-                        // TODO: se quiser, preencha tratamento padrão aqui
-                    }
-
-                    self.notes = self.notes.isEmpty
-                        ? String(format: "Confiança do modelo: %.0f%%", pred.confidence * 100)
-                        : self.notes
+            guard let img = newImage else { return }
+            
+            // Identificar a planta primeiro
+            identifyPlant(img)
+            
+            // Depois classificar a doença (se o classificador estiver disponível)
+            if let classifier = PlantDiseaseClassifier.shared {
+                classifyDisease(img, using: classifier)
+            }
+        }
+    }
+    
+    // MARK: - Plant Identification
+    private func identifyPlant(_ image: UIImage) {
+        isIdentifyingPlant = true
+        
+        PlantIdentificationService.shared.identifyPlant(image: image) { result in
+            DispatchQueue.main.async {
+                self.isIdentifyingPlant = false
+                
+                switch result {
+                case .success(let identificationResult):
+                    let plantInfo = PlantInfo(from: identificationResult)
+                    self.plantIdentificationResult = plantInfo
                     
-                    // Atualiza a confiança para mostrar na UI
-                    self.lastConfidence = pred.confidence
+                    // Preencher automaticamente o nome da planta se estiver vazio
+                    if self.plantName.isEmpty {
+                        self.plantName = plantInfo.name
+                    }
+                    
+                    // Adicionar informações científicas às observações
+                    var scientificInfo = "Planta identificada: \(plantInfo.name)"
+                    if let scientificName = plantInfo.scientificName {
+                        scientificInfo += "\nNome científico: \(scientificName)"
+                    }
+                    if let family = plantInfo.family {
+                        scientificInfo += "\nFamília: \(family)"
+                    }
+                    if !plantInfo.commonNames.isEmpty {
+                        scientificInfo += "\nNomes comuns: \(plantInfo.commonNames.joined(separator: ", "))"
+                    }
+                    scientificInfo += "\nConfiança: \(Int(plantInfo.confidence * 100))%"
+                    
+                    self.notes = scientificInfo
+                    
+                case .failure(let error):
+                    self.plantIdentificationError = error.localizedDescription
+                    self.showingPlantIdentificationAlert = true
                 }
+            }
+        }
+    }
+    
+    // MARK: - Disease Classification
+    private func classifyDisease(_ image: UIImage, using classifier: PlantDiseaseClassifier) {
+        guard !isPredicting else { return }
+        
+        isPredicting = true
+        classifier.classify(image) { pred in
+            DispatchQueue.main.async {
+                self.isPredicting = false
+                guard let pred = pred else { return }
+
+                // Tenta casar com suas doenças comuns; se não houver, usa personalizado
+                if let match = self.tryMatchCommonDisease(named: pred.disease) {
+                    self.selectedDisease = match
+                    self.customDisease = ""
+                    self.customTreatment = ""
+                } else {
+                    self.selectedDisease = nil
+                    self.customDisease = pred.disease
+                    // TODO: se quiser, preencha tratamento padrão aqui
+                }
+
+                // Atualiza a confiança para mostrar na UI
+                self.lastConfidence = pred.confidence
             }
         }
     }
@@ -352,6 +411,8 @@ struct PhotoSection: View {
     @Binding var showingImagePicker: Bool
     let isPredicting: Bool
     let lastConfidence: Double
+    let isIdentifyingPlant: Bool
+    let plantIdentificationResult: PlantInfo?
     
     var body: some View {
         VStack(spacing: DS.Spacing.md) {
@@ -365,15 +426,42 @@ struct PhotoSection: View {
                 showingImagePicker: $showingImagePicker
             )
             
+            // Indicador de identificação da planta em andamento
+            if isIdentifyingPlant {
+                HStack(spacing: DS.Spacing.sm) {
+                    ProgressView()
+                        .scaleEffect(0.8)
+                    
+                    Text("Identificando planta...")
+                        .font(.caption)
+                        .foregroundColor(DS.ColorSet.textSecondary)
+                }
+                .padding(.top, DS.Spacing.sm)
+            }
+            
             // Indicador de classificação em andamento
             if isPredicting {
                 HStack(spacing: DS.Spacing.sm) {
                     ProgressView()
                         .scaleEffect(0.8)
                     
-                    Text("Analisando imagem...")
+                    Text("Analisando doença...")
                         .font(.caption)
                         .foregroundColor(DS.ColorSet.textSecondary)
+                }
+                .padding(.top, DS.Spacing.sm)
+            }
+            
+            // Mensagem de sucesso da identificação da planta
+            if !isIdentifyingPlant && plantIdentificationResult != nil {
+                HStack(spacing: DS.Spacing.sm) {
+                    Image(systemName: "leaf.fill")
+                        .foregroundColor(.green)
+                        .font(.caption)
+                    
+                    Text("Planta identificada: \(plantIdentificationResult?.name ?? "")")
+                        .font(.caption)
+                        .foregroundColor(.green)
                 }
                 .padding(.top, DS.Spacing.sm)
             }
@@ -382,12 +470,12 @@ struct PhotoSection: View {
             if !isPredicting && selectedPhoto != nil && lastConfidence > 0 {
                 HStack(spacing: DS.Spacing.sm) {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.green)
+                        .foregroundColor(.blue)
                         .font(.caption)
                     
-                    Text("Análise concluída com \(Int(lastConfidence * 100))% de confiança")
+                    Text("Doença analisada com \(Int(lastConfidence * 100))% de confiança")
                         .font(.caption)
-                        .foregroundColor(.green)
+                        .foregroundColor(.blue)
                 }
                 .padding(.top, DS.Spacing.sm)
             }
