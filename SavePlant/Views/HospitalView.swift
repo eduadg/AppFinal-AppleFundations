@@ -238,6 +238,12 @@ struct AddPlantManuallyView: View {
                             showingDiseasePicker: $showingDiseasePicker,
                             showingCustomDisease: $showingCustomDisease
                         )
+                        .onChange(of: selectedDisease) { oldValue, newValue in
+                            if let disease = newValue {
+                                // Sempre sincroniza tratamento com a doença selecionada
+                                self.customTreatment = disease.treatment
+                            }
+                        }
                         
                         // Notes Section
                         NotesSection(notes: $notes)
@@ -621,6 +627,10 @@ struct SuggestedDiseasesSection: View {
                                             .foregroundColor(DS.ColorSet.textPrimary)
                                         Text(disease.description)
                                             .font(.caption)
+                                            .foregroundColor(DS.ColorSet.textSecondary)
+                                            .lineLimit(2)
+                                        Text("Tratamento: \(disease.treatment)")
+                                            .font(.caption2)
                                             .foregroundColor(DS.ColorSet.textSecondary)
                                             .lineLimit(2)
                                     }
