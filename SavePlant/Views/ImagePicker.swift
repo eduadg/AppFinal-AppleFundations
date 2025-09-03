@@ -38,6 +38,13 @@ struct ImagePicker: UIViewControllerRepresentable {
             } else if let originalImage = info[.originalImage] as? UIImage {
                 parent.selectedImage = originalImage
             }
+            
+            // Notificação com o nome do arquivo (se disponível)
+            if let url = info[.imageURL] as? URL {
+                NotificationCenter.default.post(name: .imagePickerSelectedFileName,
+                                                object: nil,
+                                                userInfo: ["filename": url.lastPathComponent])
+            }
             parent.dismiss()
         }
         
@@ -103,4 +110,9 @@ struct ImagePickerActionSheet: View {
             ImagePicker(selectedImage: $selectedImage, sourceType: sourceType)
         }
     }
+}
+
+// Notificação para compartilhar o nome do arquivo selecionado
+extension Notification.Name {
+    static let imagePickerSelectedFileName = Notification.Name("imagePickerSelectedFileName")
 }

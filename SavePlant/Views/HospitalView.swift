@@ -187,6 +187,7 @@ struct AddPlantManuallyView: View {
     @State private var plantIdentificationResult: PlantInfo?
     @State private var showingPlantIdentificationAlert = false
     @State private var plantIdentificationError: String?
+    @State private var pickedFilename: String = ""
     
     private var isFormValid: Bool {
         !plantName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
@@ -278,12 +279,25 @@ struct AddPlantManuallyView: View {
         .onChange(of: selectedPhoto) { oldValue, newValue in
             guard let newImage = newValue else { return }
             
+            // 1) Regras fake por nome de arquivo, se disponível
+            if let rule = FakePlantRules.match(from: pickedFilename) {
+                applyFakeRule(rule)
+            } else {
+                // 2) Tenta API PlantNet
+                identifyPlant(newImage)
+            }
+            
             // Identificar a planta primeiro
-            identifyPlant(newImage)
+            // (feito acima)
             
             // Depois classificar a doença (se o classificador estiver disponível)
             if let classifier = PlantDiseaseClassifier.shared {
                 classifyDisease(newImage, using: classifier)
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .imagePickerSelectedFileName)) { notification in
+            if let filename = notification.userInfo?["filename"] as? String {
+                self.pickedFilename = filename
             }
         }
     }
@@ -359,6 +373,31 @@ struct AddPlantManuallyView: View {
                     self.notes += "\n\n" + fallbackInfo
                 }
             }
+        }
+    }
+
+    // MARK: - Aplicar regra fake (por nome de arquivo)
+    private func applyFakeRule(_ rule: FakePlantRule) {
+        // Preenche nome da planta se estiver vazio
+        if self.plantName.isEmpty {
+            self.plantName = rule.plantName
+        }
+
+        // Casa doença com lista comum, senão usa personalizada
+        if let match = self.tryMatchCommonDisease(named: rule.diseaseName) {
+            self.selectedDisease = match
+            self.customDisease = ""
+            self.customTreatment = ""
+        } else {
+            self.selectedDisease = nil
+            self.customDisease = rule.diseaseName
+        }
+
+        // Observações
+        if self.notes.isEmpty {
+            self.notes = rule.note
+        } else {
+            self.notes += "\n\n" + rule.note
         }
     }
     
