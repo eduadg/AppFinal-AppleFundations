@@ -2,7 +2,7 @@
 
 ## Funcionalidade Implementada
 
-O projeto SavePlant agora inclui uma funcionalidade de identificação automática de plantas usando a API do Plant.id. Quando o usuário seleciona uma foto de uma planta na seção Hospital, o sistema automaticamente:
+O projeto SavePlant inclui uma funcionalidade de identificação automática de plantas usando a API do PlantNet. Quando o usuário seleciona uma foto de uma planta na seção Hospital, o sistema automaticamente:
 
 1. **Identifica a espécie da planta** usando IA
 2. **Preenche automaticamente** o nome da planta
@@ -17,7 +17,7 @@ O projeto SavePlant agora inclui uma funcionalidade de identificação automáti
 - Seleciona uma foto da planta
 
 ### 2. Identificação Automática
-- A foto é enviada para a API do Plant.id
+- A foto é enviada para a API do PlantNet
 - O sistema recebe informações detalhadas sobre a planta:
   - Nome comum da planta
   - Nome científico
@@ -34,37 +34,29 @@ O projeto SavePlant agora inclui uma funcionalidade de identificação automáti
 
 ### Chave da API
 
-⚠️ **IMPORTANTE**: A funcionalidade atualmente usa dados simulados para demonstração.
+⚠️ **IMPORTANTE**: Se você não configurar a chave da PlantNet, o app usa um fallback (mock) para demonstração e não fará chamadas externas.
 
-Para ativar a API real do Plant.id:
+Para ativar a API real do PlantNet:
 
-1. **Obtenha uma chave válida** em https://plant.id/
-2. **Substitua a chave** no arquivo `PlantIdentificationService.swift`
-3. **Descomente** o código da API real
-4. **Comente** o código de simulação
-
-Chave atual (pode estar inválida):
-```
-bEKhd6HBXL7o18HVtUmjeHKk2THUCVaD5QUbQnIP5TmMcPtard
-```
+1. Crie uma conta e gere uma chave em `https://my.plantnet.org/`
+2. Abra `Models/PlantNetService.swift`
+3. Defina o valor da constante `apiKey` (linha comentada com TODO)
+4. Rode o app e teste a identificação
 
 ### Endpoint
-- **URL**: `https://api.plant.id/v2/identify`
+- **URL**: `https://my-api.plantnet.org/v2/identify/all?api-key=YOUR_KEY`
 - **Método**: POST
 - **Formato**: multipart/form-data
 - **Parâmetros**:
   - `images`: arquivo de imagem da planta
-  - `organs`: "leaf" (foco em folhas)
-  - `include_related_images`: "true"
-  - `lang`: "pt" (português)
+  - `organs`: "leaf" (sugestão para melhorar precisão)
 
 ## Arquivos Modificados
 
-### 1. `Models/PlantIdentificationService.swift` (NOVO)
-- Serviço para comunicação com a API do Plant.id
-- Modelos de dados para resposta da API
-- Tratamento de erros
-- Extrator de informações da planta
+### 1. `Models/PlantNetService.swift` (NOVO)
+- Serviço para comunicação com a API do PlantNet (com fallback mock)
+- Modelos mínimos para mapear resposta
+- Conversão para `PlantInfo`
 
 ### 2. `Views/HospitalView.swift`
 - Integração com o serviço de identificação

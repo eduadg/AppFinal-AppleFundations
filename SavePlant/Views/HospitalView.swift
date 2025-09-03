@@ -288,39 +288,28 @@ struct AddPlantManuallyView: View {
         }
     }
     
-    // MARK: - Plant Identification
+    // MARK: - Plant Identification (PlantNet)
     private func identifyPlant(_ image: UIImage) {
         isIdentifyingPlant = true
         
-        PlantIdentificationService.shared.identifyPlant(image: image) { result in
+        PlantNetService.shared.identifyPlant(image: image) { result in
             DispatchQueue.main.async {
                 self.isIdentifyingPlant = false
                 
                 switch result {
-                case .success(let identificationResult):
-                    let plantInfo = PlantInfo(from: identificationResult)
+                case .success(let plantInfo):
                     self.plantIdentificationResult = plantInfo
                     
-                    // Preencher automaticamente o nome da planta se estiver vazio
                     if self.plantName.isEmpty {
                         self.plantName = plantInfo.name
                     }
                     
-                    // Adicionar informações científicas às observações
                     var scientificInfo = "Planta identificada: \(plantInfo.name)"
-                    if let scientificName = plantInfo.scientificName {
-                        scientificInfo += "\nNome científico: \(scientificName)"
-                    }
-                    if let family = plantInfo.family {
-                        scientificInfo += "\nFamília: \(family)"
-                    }
-                    if !plantInfo.commonNames.isEmpty {
-                        scientificInfo += "\nNomes comuns: \(plantInfo.commonNames.joined(separator: ", "))"
-                    }
+                    if let scientificName = plantInfo.scientificName { scientificInfo += "\nNome científico: \(scientificName)" }
+                    if let family = plantInfo.family { scientificInfo += "\nFamília: \(family)" }
+                    if !plantInfo.commonNames.isEmpty { scientificInfo += "\nNomes comuns: \(plantInfo.commonNames.joined(separator: ", "))" }
                     scientificInfo += "\nConfiança: \(Int(plantInfo.confidence * 100))%"
-                    
                     self.notes = scientificInfo
-                    
                 case .failure(let error):
                     self.plantIdentificationError = error.localizedDescription
                     self.showingPlantIdentificationAlert = true
