@@ -837,3 +837,4 @@ struct NotesSection: View {
 #Preview {
     HospitalView()
 }
+t
