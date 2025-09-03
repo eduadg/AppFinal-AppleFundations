@@ -3,49 +3,40 @@ import UIKit
 
 // MARK: - Plant Identification Models
 public struct PlantIdentificationResult: Codable {
-    let result: PlantResult?
+    let suggestions: [PlantSuggestion]?
+    let images: [PlantImage]?
     let status: String?
     let message: String?
     
-    // Campos opcionais para compatibilidade com diferentes versões da API
-    let classification: [PlantClassification]?
-    let images: [PlantImage]?
-    let plantDetails: PlantDetails?
-    
-    struct PlantResult: Codable {
-        let classification: [PlantClassification]?
-        let images: [PlantImage]?
-        let plantDetails: PlantDetails?
-        
-        enum CodingKeys: String, CodingKey {
-            case classification
-            case images
-            case plantDetails = "plant_details"
-        }
-    }
-    
-    // Coding keys para compatibilidade com diferentes formatos
     enum CodingKeys: String, CodingKey {
-        case result
+        case suggestions
+        case images
         case status
         case message
-        case classification
-        case images
-        case plantDetails = "plant_details"
     }
 }
 
-public struct PlantClassification: Codable {
-    let name: String
+public struct PlantSuggestion: Codable {
+    let plantName: String
+    let plantDetails: PlantDetails?
     let probability: Double
-    let similarImages: [String]
+    let similarImages: [SimilarImage]?
     
     enum CodingKeys: String, CodingKey {
-        case name
+        case plantName = "plant_name"
+        case plantDetails = "plant_details"
         case probability
         case similarImages = "similar_images"
     }
 }
+
+public struct SimilarImage: Codable {
+    let id: String
+    let url: String
+    let similarity: Double
+}
+
+
 
 public struct PlantImage: Codable {
     let id: String
@@ -135,46 +126,44 @@ public class PlantIdentificationService: ObservableObject {
     private init() {}
     
     public func identifyPlant(image: UIImage, completion: @escaping (Result<PlantIdentificationResult, Error>) -> Void) {
+        // Simular identificação para demonstração (remover quando API estiver funcionando)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            let mockResult = self.createMockResult()
+            completion(.success(mockResult))
+        }
+        
+        // Implementação real da API (descomentada quando resolver o problema da chave)
+        /*
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
             completion(.failure(PlantIdentificationError.invalidImage))
             return
         }
         
-        // Preparar o corpo da requisição
-        let boundary = UUID().uuidString
-        var request = URLRequest(url: URL(string: baseURL)!)
-        request.httpMethod = "POST"
-        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-        request.setValue("Api-Key \(apiKey)", forHTTPHeaderField: "Api-Key")
+        // Converter imagem para base64
+        let base64String = imageData.base64EncodedString()
         
-        var body = Data()
-        
-        // Adicionar parâmetros da API
-        let parameters = [
-            "images": "",
-            "organs": "leaf",
-            "include_related_images": "true",
-            "no_reject": "false",
-            "lang": "pt"
+        // Preparar corpo JSON conforme documentação da API Plant.id
+        let requestBody: [String: Any] = [
+            "images": [base64String],
+            "modifiers": ["crops", "similar_images"],
+            "plant_details": ["common_names"]
         ]
         
-        for (key, value) in parameters {
-            body.append("--\(boundary)\r\n".data(using: .utf8)!)
-            body.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
-            body.append("\(value)\r\n".data(using: .utf8)!)
+        var request = URLRequest(url: URL(string: baseURL)!)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(apiKey, forHTTPHeaderField: "Api-Key")
+        
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: requestBody)
+        } catch {
+            completion(.failure(error))
+            return
         }
+        */
         
-        // Adicionar a imagem
-        body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"images\"; filename=\"plant.jpg\"\r\n".data(using: .utf8)!)
-        body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
-        body.append(imageData)
-        body.append("\r\n".data(using: .utf8)!)
-        
-        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
-        
-        request.httpBody = body
-        
+        // Comentado para demonstração - descomentar quando API estiver funcionando
+        /*
         URLSession.shared.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
                 if let error = error {
@@ -199,27 +188,75 @@ public class PlantIdentificationService: ObservableObject {
                 }
                 
                 do {
-                    // Debug: imprimir resposta da API para entender o formato
-                    if let jsonString = String(data: data, encoding: .utf8) {
-                        print("API Response: \(jsonString)")
-                    }
-                    
                     let result = try JSONDecoder().decode(PlantIdentificationResult.self, from: data)
                     completion(.success(result))
                 } catch {
-                    print("Decoding error: \(error)")
-                    print("Response data: \(String(data: data, encoding: .utf8) ?? "Unable to convert to string")")
-                    
-                    // Tentar decodificar como erro da API
-                    if let errorResponse = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                       let errorMessage = errorResponse["message"] as? String {
-                        completion(.failure(PlantIdentificationError.apiError(errorMessage)))
-                    } else {
-                        completion(.failure(PlantIdentificationError.decodingError(error)))
-                    }
+                    completion(.failure(PlantIdentificationError.decodingError(error)))
                 }
             }
         }.resume()
+        */
+    }
+    
+    // MARK: - Mock Data para Demonstração
+    private func createMockResult() -> PlantIdentificationResult {
+        // Array de plantas possíveis para variedade
+        let possiblePlants = [
+            ("Limoeiro", "Citrus × limon", "Rutaceae", ["Limoeiro", "Limão"]),
+            ("Rosa", "Rosa gallica", "Rosaceae", ["Rosa", "Rosa-vermelha"]),
+            ("Manjericão", "Ocimum basilicum", "Lamiaceae", ["Manjericão", "Basilicão"]),
+            ("Tomaterio", "Solanum lycopersicum", "Solanaceae", ["Tomate", "Tomateiro"]),
+            ("Alecrim", "Rosmarinus officinalis", "Lamiaceae", ["Alecrim", "Rosmarinho"])
+        ]
+        
+        // Selecionar uma planta aleatória
+        let randomPlant = possiblePlants.randomElement()!
+        
+        let plantDetails = PlantDetails(
+            commonNames: randomPlant.3,
+            scientificName: randomPlant.1,
+            family: randomPlant.2,
+            genus: randomPlant.1.components(separatedBy: " ").first,
+            year: nil,
+            bibliography: nil,
+            author: nil,
+            familyCommonName: "Família \(randomPlant.2)",
+            genusId: nil,
+            mainSpeciesId: nil,
+            mainSpeciesGenus: nil,
+            mainSpeciesGenusId: nil,
+            mainSpecies: nil,
+            mainSpeciesAuthor: nil,
+            subspecies: nil,
+            variety: nil,
+            subvariety: nil,
+            form: nil,
+            subspecies2: nil,
+            species: nil,
+            speciesAggregate: nil,
+            microspecies: nil,
+            links: nil,
+            source: nil,
+            curator: nil,
+            lastUpdate: nil
+        )
+        
+        // Confidence entre 75% e 95%
+        let confidence = Double.random(in: 0.75...0.95)
+        
+        let suggestion = PlantSuggestion(
+            plantName: randomPlant.0,
+            plantDetails: plantDetails,
+            probability: confidence,
+            similarImages: nil
+        )
+        
+        return PlantIdentificationResult(
+            suggestions: [suggestion],
+            images: nil,
+            status: "success",
+            message: "Identificação realizada com sucesso (simulação)"
+        )
     }
 }
 
@@ -253,36 +290,23 @@ public struct PlantInfo {
     let confidence: Double
     
     init(from result: PlantIdentificationResult) {
-        // Tentar obter classificação de diferentes locais
-        var classification: PlantClassification?
-        
-        if let firstClassification = result.classification?.first {
-            classification = firstClassification
-        } else if let firstClassification = result.result?.classification?.first {
-            classification = firstClassification
-        }
-        
-        if let classification = classification {
-            self.name = classification.name
-            self.confidence = classification.probability
+        // Obter a primeira sugestão com maior probabilidade
+        if let firstSuggestion = result.suggestions?.first {
+            self.name = firstSuggestion.plantName
+            self.confidence = firstSuggestion.probability
+            
+            if let details = firstSuggestion.plantDetails {
+                self.scientificName = details.scientificName
+                self.family = details.family
+                self.commonNames = details.commonNames ?? []
+            } else {
+                self.scientificName = nil
+                self.family = nil
+                self.commonNames = []
+            }
         } else {
             self.name = "Planta não identificada"
             self.confidence = 0.0
-        }
-        
-        // Tentar obter detalhes de diferentes locais
-        var details: PlantDetails?
-        if let plantDetails = result.plantDetails {
-            details = plantDetails
-        } else if let plantDetails = result.result?.plantDetails {
-            details = plantDetails
-        }
-        
-        if let details = details {
-            self.scientificName = details.scientificName
-            self.family = details.family
-            self.commonNames = details.commonNames ?? []
-        } else {
             self.scientificName = nil
             self.family = nil
             self.commonNames = []

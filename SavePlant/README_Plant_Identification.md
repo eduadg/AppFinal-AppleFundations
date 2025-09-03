@@ -33,7 +33,17 @@ O projeto SavePlant agora inclui uma funcionalidade de identificação automáti
 ## Configuração da API
 
 ### Chave da API
-A funcionalidade usa a chave da API do Plant.id:
+
+⚠️ **IMPORTANTE**: A funcionalidade atualmente usa dados simulados para demonstração.
+
+Para ativar a API real do Plant.id:
+
+1. **Obtenha uma chave válida** em https://plant.id/
+2. **Substitua a chave** no arquivo `PlantIdentificationService.swift`
+3. **Descomente** o código da API real
+4. **Comente** o código de simulação
+
+Chave atual (pode estar inválida):
 ```
 bEKhd6HBXL7o18HVtUmjeHKk2THUCVaD5QUbQnIP5TmMcPtard
 ```
