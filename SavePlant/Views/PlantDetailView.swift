@@ -4,6 +4,8 @@ public struct PlantDetailView: View {
     @State private var plant: PlantInTreatment
     @State private var showingAddPhoto = false
     @State private var newPhoto: UIImage?
+    @State private var showingGallery = false
+    @State private var galleryIndex: Int = 0
     @StateObject private var hospitalData = HospitalDataManager.shared
     @Environment(\.dismiss) private var dismiss
     
@@ -80,8 +82,11 @@ public struct PlantDetailView: View {
                 // Treatment Section
                 TreatmentSection(treatment: plant.treatment)
                 
-                // Timeline Section
-                TimelineSection(analyses: plant.timeline)
+                // Timeline Section (tap para abrir galeria)
+                TimelineSection(analyses: plant.timeline, onSelectIndex: { idx in
+                    self.galleryIndex = idx
+                    self.showingGallery = true
+                })
                 
                 // Add Photo Button
                 Button(action: {
@@ -116,6 +121,9 @@ public struct PlantDetailView: View {
             updated.addAnalysis(PlantAnalysis(photo: img))
             hospitalData.updatePlant(updated)
             plant = updated
+        }
+        .fullScreenCover(isPresented: $showingGallery) {
+            PhotoPagerView(analyses: plant.timeline, currentIndex: $galleryIndex)
         }
         .onReceive(hospitalData.$plantsInTreatment) { list in
             if let updated = list.first(where: { $0.id == plant.id }) {
@@ -204,6 +212,7 @@ struct TreatmentSection: View {
 
 struct TimelineSection: View {
     let analyses: [PlantAnalysis]
+    var onSelectIndex: (Int) -> Void = { _ in }
     
     var body: some View {
         VStack(alignment: .leading, spacing: DS.Spacing.md) {
@@ -224,10 +233,13 @@ struct TimelineSection: View {
             } else {
                 LazyVStack(spacing: DS.Spacing.md) {
                     ForEach(Array(analyses.enumerated()), id: \.offset) { index, analysis in
-                        TimelineItem(
-                            analysis: analysis,
-                            isLatest: index == analyses.count - 1
-                        )
+                        Button(action: { onSelectIndex(index) }) {
+                            TimelineItem(
+                                analysis: analysis,
+                                isLatest: index == analyses.count - 1
+                            )
+                        }
+                        .buttonStyle(PlainButtonStyle())
                     }
                 }
             }
@@ -285,39 +297,55 @@ struct TimelineItem: View {
     }
 }
 
-// Placeholder for Add Photo View
-struct AddPhotoView: View {
-    @Binding var plant: PlantInTreatment
+// Visualizador de fotos com navegação por versões (somente leitura)
+struct PhotoPagerView: View {
+    let analyses: [PlantAnalysis]
+    @Binding var currentIndex: Int
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        NavigationView {
-            VStack {
-                Text("Adicionar Nova Foto")
-                    .font(.title2)
-                    .padding()
-                
-                Text("Funcionalidade em desenvolvimento")
-                    .foregroundColor(.secondary)
-                
-                Spacer()
+        ZStack {
+            Color.black.ignoresSafeArea()
+            TabView(selection: $currentIndex) {
+                ForEach(Array(analyses.enumerated()), id: \.offset) { idx, analysis in
+                    VStack(spacing: 0) {
+                        Spacer(minLength: 0)
+                        Image(uiImage: analysis.photo)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .tag(idx)
+                        VStack(spacing: 6) {
+                            Text(analysis.date.formatted(.dateTime.day().month(.abbreviated).year().hour().minute()))
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.8))
+                            if let notes = analysis.notes, !notes.isEmpty {
+                                Text(notes)
+                                    .font(.caption2)
+                                    .foregroundColor(.white.opacity(0.7))
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal)
+                            }
+                        }
+                        .padding(.vertical, 12)
+                    }
+                }
             }
-            .navigationTitle("Nova Foto")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancelar") {
-                        dismiss()
+            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
+            .indexViewStyle(.page(backgroundDisplayMode: .always))
+            
+            VStack {
+                HStack {
+                    Button(action: { dismiss() }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 28, weight: .semibold))
+                            .foregroundColor(.white)
+                            .shadow(radius: 4)
                     }
+                    .padding()
+                    Spacer()
                 }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Salvar") {
-                        // TODO: Implement photo saving
-                        dismiss()
-                    }
-                    .disabled(true)
-                }
+                Spacer()
             }
         }
     }
