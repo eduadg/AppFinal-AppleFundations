@@ -294,10 +294,9 @@ struct AddPlantManuallyView: View {
         
         PlantNetService.shared.identifyPlant(image: image) { result in
             DispatchQueue.main.async {
-                self.isIdentifyingPlant = false
-                
                 switch result {
                 case .success(let plantInfo):
+                    self.isIdentifyingPlant = false
                     self.plantIdentificationResult = plantInfo
                     
                     if self.plantName.isEmpty {
@@ -310,9 +309,54 @@ struct AddPlantManuallyView: View {
                     if !plantInfo.commonNames.isEmpty { scientificInfo += "\nNomes comuns: \(plantInfo.commonNames.joined(separator: ", "))" }
                     scientificInfo += "\nConfiança: \(Int(plantInfo.confidence * 100))%"
                     self.notes = scientificInfo
-                case .failure(let error):
-                    self.plantIdentificationError = error.localizedDescription
+                case .failure:
+                    // Fallback offline com modelo local
+                    self.fallbackIdentifyWithLocalModel(image)
+                }
+            }
+        }
+    }
+
+    // MARK: - Fallback local (Core ML)
+    private func fallbackIdentifyWithLocalModel(_ image: UIImage) {
+        guard let classifier = PlantDiseaseClassifier.shared else {
+            self.isIdentifyingPlant = false
+            self.plantIdentificationError = "Não foi possível inicializar o classificador local."
+            self.showingPlantIdentificationAlert = true
+            return
+        }
+        classifier.classify(image) { pred in
+            DispatchQueue.main.async {
+                self.isIdentifyingPlant = false
+                guard let pred = pred else {
+                    self.plantIdentificationError = "Falha na identificação offline."
                     self.showingPlantIdentificationAlert = true
+                    return
+                }
+
+                // Preenche planta
+                if self.plantName.isEmpty, !pred.plant.isEmpty {
+                    self.plantName = pred.plant
+                }
+
+                // Preenche doença/treatment conforme lógica existente
+                if let match = self.tryMatchCommonDisease(named: pred.disease) {
+                    self.selectedDisease = match
+                    self.customDisease = ""
+                    self.customTreatment = ""
+                } else {
+                    self.selectedDisease = nil
+                    self.customDisease = pred.disease
+                }
+
+                self.lastConfidence = pred.confidence
+
+                // Observações informando fallback offline
+                let fallbackInfo = "Identificação offline (modelo local) com \(Int(pred.confidence * 100))% de confiança."
+                if self.notes.isEmpty {
+                    self.notes = fallbackInfo
+                } else {
+                    self.notes += "\n\n" + fallbackInfo
                 }
             }
         }
