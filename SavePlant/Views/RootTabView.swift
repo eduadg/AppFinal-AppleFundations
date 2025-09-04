@@ -14,9 +14,9 @@ public struct RootTabView: View {
                 .tag(1)
                 .tabItem { Image(systemName: "cross.case.fill"); Text("Hospital") }
             
-            CommunityView()
+            EnciclopediaView()
                 .tag(2)
-                .tabItem { Image(systemName: "person.3.fill"); Text("Comunidade") }
+                .tabItem { Image(systemName: "book.pages.fill"); Text("Enciclopédia") }
         }
         .tint(DS.ColorSet.brand)
     }
