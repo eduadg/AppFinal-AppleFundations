@@ -51,7 +51,7 @@ public struct HomeView: View {
             VStack(spacing: 0) {
                 // Header customizado
                 HStack {
-                    // Logo + Nome do App
+                    // Logo + Nome do App (Centralizado)
                     HStack(spacing: 8) { // Reduzido o espaçamento
                         // Logo do App
                         if let logoImage = UIImage(named: "logo SavePlant") {
@@ -66,12 +66,11 @@ public struct HomeView: View {
                                 .foregroundColor(DS.ColorSet.brand)
                         }
                         
-                        Text("PlantSave")
-                            .font(.largeTitle.weight(.bold))
+                        Text("SavePlant")
+                            .font(.system(size: 28, weight: .bold)) // Diminuído em 10% (de largeTitle para 28pt)
                             .foregroundColor(DS.ColorSet.textPrimary)
                     }
-                    
-                    Spacer()
+                    .frame(maxWidth: .infinity) // Centraliza o logo + nome
                     
                     // Ícone do perfil
                     Circle()
