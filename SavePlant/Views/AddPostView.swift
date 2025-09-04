@@ -140,39 +140,41 @@ public struct AddPostView: View {
         dismiss()
     }
     
-    private func fillFromPlant(_ plant: PlantInTreatment) {
-        title = "Minha experiência com \(plant.name)"
-        summary = "Compartilhando minha experiência no tratamento de \(plant.disease) em \(plant.name)."
-        selectedCategory = .tratamentos
-        relatedPlants = plant.name
-        
-        content = """
-# Minha Experiência com \(plant.name)
-
-## Situação Inicial
-                let formattedDiagnosisDate = plant.diagnosisDate.formatted(.dateTime.day().month(.abbreviated).year())
-                Minha planta \(plant.name) foi diagnosticada com **\(plant.disease)** em \(formattedDiagnosisDate).
-
-## Tratamento Aplicado
-\(plant.treatment)
-
-## Observações
-- Status atual: \(plant.status.rawValue)
-                let formattedLastUpdate = plant.lastUpdate.formatted(.dateTime.day().month(.abbreviated).year())
-                - Última atualização: \(formattedLastUpdate)
-
-## Dicas Importantes
-[Adicione suas dicas e observações aqui]
-
-## Resultados
-[Descreva os resultados obtidos]
-
----
-*Post baseado na minha planta do Hospital SavePlant*
-"""
-        
-        tags = plant.disease.lowercased() + ", " + plant.name.lowercased() + ", experiência, tratamento"
-    }
+         private func fillFromPlant(_ plant: PlantInTreatment) {
+         title = "Minha experiência com \(plant.name)"
+         summary = "Compartilhando minha experiência no tratamento de \(plant.disease) em \(plant.name)."
+         selectedCategory = .tratamentos
+         relatedPlants = plant.name
+         
+         // Formatar datas antes de usar na string
+         let formattedDiagnosisDate = plant.diagnosisDate.formatted(.dateTime.day().month(.abbreviated).year())
+         let formattedLastUpdate = plant.lastUpdate.formatted(.dateTime.day().month(.abbreviated).year())
+         
+         content = """
+ # Minha Experiência com \(plant.name)
+ 
+ ## Situação Inicial
+ Minha planta \(plant.name) foi diagnosticada com **\(plant.disease)** em \(formattedDiagnosisDate).
+ 
+ ## Tratamento Aplicado
+ \(plant.treatment)
+ 
+ ## Observações
+ - Status atual: \(plant.status.rawValue)
+ - Última atualização: \(formattedLastUpdate)
+ 
+ ## Dicas Importantes
+ [Adicione suas dicas e observações aqui]
+ 
+ ## Resultados
+ [Descreva os resultados obtidos]
+ 
+ ---
+ *Post baseado na minha planta do Hospital SavePlant*
+ """
+         
+         tags = plant.disease.lowercased() + ", " + plant.name.lowercased() + ", experiência, tratamento"
+     }
 }
 
 // MARK: - Hospital Integration Card
