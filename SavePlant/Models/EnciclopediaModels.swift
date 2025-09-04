@@ -73,7 +73,12 @@ public enum PostCategory: String, CaseIterable, Codable {
 
 // MARK: - Enciclopedia Data Manager
 public class EnciclopediaDataManager: ObservableObject {
-    public static let shared = EnciclopediaDataManager()
+    public static let shared: EnciclopediaDataManager = {
+        print("🏗️ Criando singleton EnciclopediaDataManager...")
+        let instance = EnciclopediaDataManager()
+        print("✅ Singleton criado com sucesso")
+        return instance
+    }()
     
     @Published public var posts: [EnciclopediaPost] = []
     @Published public var filteredPosts: [EnciclopediaPost] = []
@@ -81,7 +86,10 @@ public class EnciclopediaDataManager: ObservableObject {
     @Published public var searchText: String = ""
     
     private init() {
+        print("🚀 EnciclopediaDataManager inicializando...")
         loadMockData()
+        print("📚 Mock data carregado - \(posts.count) posts criados")
+        print("🔍 Posts filtrados inicializados: \(filteredPosts.count)")
     }
     
     // MARK: - Mock Data
@@ -178,11 +186,17 @@ public class EnciclopediaDataManager: ObservableObject {
     
     // MARK: - Filtering
     public func filterPosts() {
+        print("🔍 filterPosts() chamado")
+        print("📊 Posts originais: \(posts.count)")
+        print("🎯 Categoria selecionada: \(selectedCategory?.rawValue ?? "Nenhuma")")
+        print("🔍 Texto de busca: '\(searchText)'")
+        
         var filtered = posts
         
         // Filter by category
         if let category = selectedCategory {
             filtered = filtered.filter { $0.category == category }
+            print("🎯 Após filtro de categoria: \(filtered.count) posts")
         }
         
         // Filter by search text
@@ -192,9 +206,11 @@ public class EnciclopediaDataManager: ObservableObject {
                 post.content.localizedCaseInsensitiveContains(searchText) ||
                 post.tags.contains { $0.localizedCaseInsensitiveContains(searchText) }
             }
+            print("🔍 Após filtro de texto: \(filtered.count) posts")
         }
         
         filteredPosts = filtered
+        print("✅ Posts filtrados finais: \(filteredPosts.count)")
     }
     
     // MARK: - Post Management

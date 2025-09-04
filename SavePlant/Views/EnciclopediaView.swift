@@ -85,6 +85,22 @@ public struct EnciclopediaView: View {
                                     .foregroundColor(DS.ColorSet.textSecondary)
                                     .multilineTextAlignment(.center)
                                     .padding(.horizontal, DS.Spacing.xl)
+                                
+                                // Botão de teste temporário
+                                Button(action: {
+                                    print("🔍 Teste - Total de posts: \(enciclopediaData.posts.count)")
+                                    print("🔍 Teste - Posts filtrados: \(enciclopediaData.filteredPosts.count)")
+                                    enciclopediaData.filterPosts()
+                                    print("✅ Teste - Após filtros: \(enciclopediaData.filteredPosts.count)")
+                                }) {
+                                    Text("🔍 Testar Dados")
+                                        .font(.caption)
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 8)
+                                        .background(Color.blue)
+                                        .cornerRadius(8)
+                                }
                             }
                             
                             Spacer()
@@ -147,7 +163,15 @@ public struct EnciclopediaView: View {
             PostDetailView(post: post)
         }
         .onAppear {
-            enciclopediaData.filterPosts()
+            print("🔍 EnciclopediaView apareceu")
+            print("📊 Total de posts: \(enciclopediaData.posts.count)")
+            print("🔍 Posts filtrados: \(enciclopediaData.filteredPosts.count)")
+            
+            // Força recarregamento dos dados
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                enciclopediaData.filterPosts()
+                print("✅ Filtros aplicados - Posts filtrados: \(enciclopediaData.filteredPosts.count)")
+            }
         }
     }
 }
