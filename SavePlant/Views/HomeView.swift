@@ -2,7 +2,7 @@ import SwiftUI
 
 public struct HomeView: View {
     @State private var search = ""
-    @State private var showingScanView = false
+    // showingScanView removido - não é mais necessário
     @EnvironmentObject private var router: AppRouter
 
     private let tipsData: [TipItem] = [
@@ -75,7 +75,12 @@ public struct HomeView: View {
                         VStack(spacing: DS.Spacing.md) {
                             // Card A - Diagnosticar agora (largura total)
                             Button(action: {
-                                showingScanView = true
+                                // Vai direto para o Hospital (tab 1) e abre modal de adicionar planta
+                                router.selectedTab = 1
+                                // Pequeno delay para garantir que a tab mudou antes de abrir o modal
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    NotificationCenter.default.post(name: .showAddPlantModal, object: nil)
+                                }
                             }) {
                                 HStack {
                                     Spacer()
@@ -196,8 +201,8 @@ public struct HomeView: View {
                                 
                                 // Card C - Enciclopédia
                                 Button(action: {
-                                    // Navegação para Enciclopédia será feita via TabView
-                                    // Por enquanto, mostra uma mensagem informativa
+                                    // Vai para a Enciclopédia (tab 2)
+                                    router.selectedTab = 2
                                 }) {
                                     VStack {
                                         HStack {
@@ -269,9 +274,7 @@ public struct HomeView: View {
                 }
             }
         }
-        .sheet(isPresented: $showingScanView) {
-            ScanView()
-        }
+        // ScanView sheet removido - não é mais necessário
     }
 }
 

@@ -1,7 +1,6 @@
 import SwiftUI
 
 public struct PlantDetailView: View {
-    @State private var plant: PlantInTreatment
     @State private var showingAddPhoto = false
     @State private var newPhoto: UIImage?
     @State private var showingGallery = false
@@ -9,15 +8,24 @@ public struct PlantDetailView: View {
     @StateObject private var hospitalData = HospitalDataManager.shared
     @Environment(\.dismiss) private var dismiss
     
+    private let plantId: UUID
+    
     public init(plant: PlantInTreatment) {
-        self._plant = State(initialValue: plant)
+        self.plantId = plant.id
+    }
+    
+    // Computed property para sempre pegar a planta mais atualizada
+    private var plant: PlantInTreatment? {
+        hospitalData.plantsInTreatment.first(where: { $0.id == plantId })
     }
     
     public var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: DS.Spacing.lg) {
-                // Main Photo Section
-                if let latestPhoto = plant.latestPhoto {
+        Group {
+            if let currentPlant = plant {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: DS.Spacing.lg) {
+                        // Main Photo Section
+                        if let latestPhoto = currentPlant.latestPhoto {
                     Image(uiImage: latestPhoto)
                         .resizable()
                         .scaledToFill()
@@ -71,7 +79,7 @@ public struct PlantDetailView: View {
                         .cornerRadius(DS.Radius.md)
                     }
                     
-                                    let diagnosisDate = plant.diagnosisDate
+                                    let diagnosisDate = currentPlant.diagnosisDate
                 let formattedDate = diagnosisDate.formatted(.dateTime.day().month(.abbreviated).year())
                 Text("Diagnóstico em \(formattedDate)")
                     .font(.caption)
@@ -79,13 +87,13 @@ public struct PlantDetailView: View {
                 }
                 
                 // Status Update Section (lê e atualiza direto da store pelo ID)
-                StatusUpdateSection(plantId: plant.id)
+                StatusUpdateSection(plantId: currentPlant.id)
                 
                 // Treatment Section
-                TreatmentSection(treatment: plant.treatment)
+                TreatmentSection(treatment: currentPlant.treatment)
                 
                 // Timeline Section (tap para abrir galeria)
-                TimelineSection(analyses: plant.timeline, onSelectIndex: { idx in
+                TimelineSection(analyses: currentPlant.timeline, onSelectIndex: { idx in
                     self.galleryIndex = idx
                     self.showingGallery = true
                 })
@@ -112,55 +120,80 @@ public struct PlantDetailView: View {
             .padding(DS.Spacing.md)
         }
         .navigationTitle("Detalhes da Planta")
+    } else {
+        // Planta não encontrada
+        VStack(spacing: DS.Spacing.lg) {
+            Spacer()
+            Image(systemName: "exclamationmark.triangle")
+                .font(.system(size: 64))
+                .foregroundColor(.orange)
+            
+            Text("Planta não encontrada")
+                .font(.title2.weight(.semibold))
+                .foregroundColor(DS.ColorSet.textPrimary)
+            
+            Text("A planta pode ter sido removida ou não está mais disponível")
+                .font(.body)
+                .foregroundColor(DS.ColorSet.textSecondary)
+                .multilineTextAlignment(.center)
+            
+            Button("Voltar") {
+                dismiss()
+            }
+            .foregroundColor(.white)
+            .padding(.horizontal, DS.Spacing.lg)
+            .padding(.vertical, DS.Spacing.md)
+            .background(DS.ColorSet.brand)
+            .cornerRadius(DS.Radius.md)
+            
+            Spacer()
+        }
+        .padding(DS.Spacing.lg)
+    }
+}
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingAddPhoto) {
             ImagePicker(selectedImage: $newPhoto, sourceType: .photoLibrary)
         }
         .onChange(of: newPhoto) { _, img in
-            guard let img = img else { return }
+            guard let img = img,
+                  let currentPlant = plant else { return }
             
-            print("🔄 Adicionando nova foto à planta: \(plant.name)")
+            print("🔄 Adicionando nova foto à planta: \(currentPlant.name)")
             
             // Cria nova análise com a foto
             let newAnalysis = PlantAnalysis(photo: img, date: Date())
             
-            // Atualiza a planta localmente
-            var updated = plant
+            // Atualiza a planta
+            var updated = currentPlant
             updated.addAnalysis(newAnalysis)
             
             print("📸 Total de análises após adicionar: \(updated.analyses.count)")
             print("🎯 Foto mais recente mudou: \(updated.latestPhoto != nil)")
             
-            // Atualiza no store
+            // Atualiza no store - isso vai automaticamente atualizar a UI
             hospitalData.updatePlant(updated)
             
-            // Atualiza estado local e força refresh da interface
-            DispatchQueue.main.async {
-                self.plant = updated
-                
-                // Reset do estado da foto para permitir nova seleção
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    self.newPhoto = nil
-                }
+            // Reset do estado da foto para permitir nova seleção
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.newPhoto = nil
             }
             
             print("✅ Nova foto adicionada com sucesso")
         }
         .fullScreenCover(isPresented: $showingGallery) {
-            PhotoPagerView(analyses: plant.timeline, currentIndex: $galleryIndex)
-        }
-        .onReceive(hospitalData.$plantsInTreatment) { list in
-            if let updated = list.first(where: { $0.id == plant.id }) {
-                plant = updated
+            if let currentPlant = plant {
+                PhotoPagerView(analyses: currentPlant.timeline, currentIndex: $galleryIndex)
             }
         }
+        // Removido onReceive - não é mais necessário com @StateObject
     }
 }
 
 private extension PlantDetailView {
     var currentHeaderStatus: PlantStatus {
-        let currentStatus = hospitalData.plantsInTreatment.first(where: { $0.id == plant.id })?.status
-        return currentStatus ?? plant.status
+        guard let currentPlant = plant else { return .inTreatment }
+        return currentPlant.status
     }
 }
 

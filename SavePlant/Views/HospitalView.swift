@@ -93,6 +93,94 @@ public struct HospitalView: View {
         .sheet(isPresented: $showingAddPlant) {
             AddPlantManuallyView()
         }
+        .onReceive(NotificationCenter.default.publisher(for: .showAddPlantModal)) { _ in
+            showingAddPlant = true
+        }
+            ZStack {
+                // Background
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.98, green: 0.99, blue: 0.98),
+                        Color(red: 0.94, green: 0.97, blue: 0.95),
+                        Color(red: 0.92, green: 0.95, blue: 0.93)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
+                
+                VStack(spacing: 0) {
+                    if hospitalData.plantsInTreatment.isEmpty {
+                        // Empty State
+                        VStack(spacing: DS.Spacing.lg) {
+                            Spacer()
+                            
+                            Image(systemName: "cross.case")
+                                .font(.system(size: 64))
+                                .foregroundColor(DS.ColorSet.textSecondary)
+                            
+                            VStack(spacing: DS.Spacing.sm) {
+                                Text("Nenhuma planta em tratamento")
+                                    .font(.title2.weight(.semibold))
+                                    .foregroundColor(DS.ColorSet.textPrimary)
+                                
+                                Text("Quando você diagnosticar uma planta doente, ela aparecerá aqui para acompanhamento")
+                                    .font(.body)
+                                    .foregroundColor(DS.ColorSet.textSecondary)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal, DS.Spacing.xl)
+                            }
+                            
+                            Spacer()
+                        }
+                    } else {
+                        // Plants List com swipe-to-delete
+                        List {
+                            ForEach(hospitalData.plantsInTreatment) { plant in
+                                NavigationLink(destination: PlantDetailView(plant: plant)) {
+                                    PlantCardRow(plantId: plant.id)
+                                }
+                                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                    Button(role: .destructive) {
+                                        hospitalData.removePlant(withId: plant.id)
+                                    } label: {
+                                        Label("Excluir", systemImage: "trash")
+                                    }
+                                }
+                            }
+                        }
+                        .listStyle(.plain)
+                    }
+                }
+            }
+            .navigationTitle("Hospital")
+            .navigationBarTitleDisplayMode(.inline)
+            .overlay(
+                // Floating Action Button
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        Button(action: {
+                            showingAddPlant = true
+                        }) {
+                            Image(systemName: "plus")
+                                .font(.system(size: 20, weight: .semibold))
+                                .foregroundColor(.white)
+                                .frame(width: 56, height: 56)
+                                .background(DS.ColorSet.brand)
+                                .clipShape(Circle())
+                                .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+                        }
+                        .padding(.trailing, DS.Spacing.lg)
+                        .padding(.bottom, DS.Spacing.lg)
+                    }
+                }
+            )
+        }
+        .sheet(isPresented: $showingAddPlant) {
+            AddPlantManuallyView()
+        }
     }
 }
 
@@ -955,6 +1043,11 @@ struct DiseaseSuggestionRow: View {
         }
         .buttonStyle(PlainButtonStyle())
     }
+}
+
+// MARK: - Notification Names
+extension Notification.Name {
+    static let showAddPlantModal = Notification.Name("showAddPlantModal")
 }
 
 // Preview comentado para evitar problemas de compilação
