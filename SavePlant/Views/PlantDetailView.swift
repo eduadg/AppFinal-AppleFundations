@@ -385,16 +385,18 @@ struct PhotoPagerView: View {
     }
 }
 
-#Preview {
-    NavigationView {
-        if let mockImage = UIImage(systemName: "leaf.fill") {
-            let mockPlant = PlantInTreatment(
-                name: "Tomate",
-                disease: "Mancha bacteriana",
-                photo: mockImage,
-                treatment: "Aplicar fungicida à base de cobre. Evitar molhar as folhas durante a rega."
-            )
-            PlantDetailView(plant: mockPlant)
-        }
-    }
-}
+// Preview comentado para evitar problemas de compilação
+// #Preview {
+//     NavigationView {
+//         if let mockImage = UIImage(systemName: "leaf.fill") {
+//             let mockImage = UIImage(systemName: "leaf.fill") {
+//                 let mockPlant = PlantInTreatment(
+//                     name: "Tomate",
+//                     disease: "Mancha bacteriana",
+//                     photo: mockImage,
+//                     treatment: "Aplicar fungicida à base de cobre. Evitar molhar as folhas durante a rega."
+//             )
+//             PlantDetailView(plant: mockPlant)
+//         }
+//     }
+// }

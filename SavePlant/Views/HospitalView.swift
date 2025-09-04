@@ -903,6 +903,7 @@ struct NotesSection: View {
     }
 }
 
-#Preview {
-    HospitalView()
-}
+// Preview comentado para evitar problemas de compilação
+// #Preview {
+//     HospitalView()
+// }

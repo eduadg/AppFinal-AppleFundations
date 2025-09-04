@@ -22,7 +22,8 @@ public struct RootTabView: View {
     }
 }
 
-#Preview {
-    RootTabView()
-}
+// Preview comentado para evitar problemas de compilação
+// #Preview {
+//     RootTabView()
+// }
 
