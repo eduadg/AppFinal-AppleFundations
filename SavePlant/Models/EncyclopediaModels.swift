@@ -119,7 +119,7 @@ public class EncyclopediaDataManager: ObservableObject {
     }
     
     public func likePost(_ post: EncyclopediaPost) {
-        if let index = posts.firstIndex(where: { $0.id == post.id }) {
+        if posts.contains(where: { $0.id == post.id }) {
             // TODO: Implementar sistema de likes quando EncyclopediaPost for class
             // Por enquanto, mantemos como está
         }
