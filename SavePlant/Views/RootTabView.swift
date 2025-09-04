@@ -8,7 +8,7 @@ public struct RootTabView: View {
         TabView(selection: $router.selectedTab) {
             HomeView()
                 .tag(0)
-                .tabItem { Image(systemName: "leaf.fill"); Text("Home") }
+                .tabItem { Image(systemName: "leaf.fill"); Text("Início") }
             
             HospitalView()
                 .tag(1)
