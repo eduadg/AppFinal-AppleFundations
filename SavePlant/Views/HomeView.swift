@@ -52,17 +52,17 @@ public struct HomeView: View {
                 // Header customizado
                 HStack {
                     // Logo + Nome do App
-                    HStack(spacing: DS.Spacing.sm) {
+                    HStack(spacing: 8) { // Reduzido o espaçamento
                         // Logo do App
                         if let logoImage = UIImage(named: "logo SavePlant") {
                             Image(uiImage: logoImage)
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 32, height: 32)
+                                .frame(width: 48, height: 48) // Aumentado de 32 para 48
                         } else {
                             // Fallback: ícone de folha
                             Image(systemName: "leaf.fill")
-                                .font(.system(size: 32, weight: .bold))
+                                .font(.system(size: 48, weight: .bold)) // Aumentado também
                                 .foregroundColor(DS.ColorSet.brand)
                         }
                         
