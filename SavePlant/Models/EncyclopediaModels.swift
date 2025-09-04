@@ -110,12 +110,20 @@ public class EncyclopediaDataManager: ObservableObject {
     public static let shared = EncyclopediaDataManager()
     
     private init() {
+        print("🔄 Inicializando EncyclopediaDataManager...")
         loadDefaultPosts()
+        print("✅ EncyclopediaDataManager inicializado com \(posts.count) posts")
     }
     
     public func addPost(_ post: EncyclopediaPost) {
         posts.insert(post, at: 0) // Adiciona no início
         updateFeaturedPosts()
+    }
+    
+    public func reloadData() {
+        print("🔄 Recarregando dados da enciclopédia...")
+        loadDefaultPosts()
+        print("✅ Dados recarregados: \(posts.count) posts")
     }
     
     public func likePost(_ post: EncyclopediaPost) {

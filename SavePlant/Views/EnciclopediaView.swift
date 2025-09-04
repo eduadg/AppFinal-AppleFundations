@@ -1,8 +1,8 @@
 import SwiftUI
 
 public struct EnciclopediaView: View {
-    @StateObject private var encyclopediaData = EncyclopediaDataManager.shared
-    @StateObject private var hospitalData = HospitalDataManager.shared
+    @ObservedObject private var encyclopediaData = EncyclopediaDataManager.shared
+    @ObservedObject private var hospitalData = HospitalDataManager.shared
     @State private var searchText = ""
     @State private var selectedCategory: PostCategory?
     @State private var showingAddPost = false
@@ -26,6 +26,20 @@ public struct EnciclopediaView: View {
                 
                 ScrollView {
                     VStack(spacing: DS.Spacing.lg) {
+                        // Debug info
+                        if encyclopediaData.posts.isEmpty {
+                            VStack {
+                                Text("🐛 Debug: \(encyclopediaData.posts.count) posts carregados")
+                                    .font(.caption)
+                                    .foregroundColor(.red)
+                                Button("Recarregar") {
+                                    print("🔄 Tentando recarregar posts...")
+                                    encyclopediaData.reloadData()
+                                }
+                            }
+                            .padding()
+                        }
+                        
                         // Search Bar
                         SearchBarView(text: $searchText)
                             .padding(.horizontal, DS.Spacing.md)
@@ -74,6 +88,13 @@ public struct EnciclopediaView: View {
             AddPostView()
         }
         .environmentObject(encyclopediaData)
+        .onAppear {
+            print("🔄 EnciclopediaView onAppear - Posts: \(encyclopediaData.posts.count)")
+            if encyclopediaData.posts.isEmpty {
+                print("⚠️ Posts vazios, forçando reload...")
+                encyclopediaData.reloadData()
+            }
+        }
     }
 }
 
