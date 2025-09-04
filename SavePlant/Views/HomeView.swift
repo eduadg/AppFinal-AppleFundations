@@ -83,8 +83,14 @@ public struct HomeView: View {
                             SearchBar(
                                 text: $search, 
                                 placeholder: "Digite o nome da planta ou doença...",
-                                onSearch: performSearch
+                                onSearch: {
+                                    print("🔍 Busca executada para: \(search)")
+                                    performSearch()
+                                }
                             )
+                            .onTapGesture {
+                                print("👆 SearchBar tocada")
+                            }
                         }
                         .padding(EdgeInsets(top: DS.Spacing.md, leading: 0, bottom: 0, trailing: 0))
 
@@ -335,11 +341,17 @@ public struct HomeView: View {
             }
         }
         .onChange(of: search) { _, newValue in
+            // Debounce para evitar muitas buscas durante a digitação
             if newValue.isEmpty {
                 isSearching = false
                 searchResults = []
             } else {
-                performSearch()
+                // Pequeno delay para permitir que o usuário termine de digitar
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    if search == newValue { // Só executa se o texto não mudou
+                        performSearch()
+                    }
+                }
             }
         }
         // ScanView sheet removido - não é mais necessário

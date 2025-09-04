@@ -4,6 +4,7 @@ public struct SearchBar: View {
     @Binding var text: String
     var placeholder: String
     var onSearch: (() -> Void)?
+    @FocusState private var isFocused: Bool
     
     public init(text: Binding<String>, placeholder: String = "Search", onSearch: (() -> Void)? = nil) {
         self._text = text
@@ -20,32 +21,41 @@ public struct SearchBar: View {
             TextField(placeholder, text: $text)
                 .textInputAutocapitalization(.never)
                 .disableAutocorrection(true)
+                .focused($isFocused)
                 .onSubmit {
                     onSearch?()
                 }
+                .onTapGesture {
+                    isFocused = true
+                }
+                .submitLabel(.search)
             
             if !text.isEmpty {
                 Button(action: {
                     text = ""
+                    isFocused = true
                 }) {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundColor(.secondary)
                         .font(.system(size: 16))
                 }
+                .buttonStyle(PlainButtonStyle())
             }
         }
         .padding(.vertical, DS.Spacing.sm)
         .padding(.horizontal, DS.Spacing.md)
-        // Fundo branco + sombra mais marcada, igual ao mock
         .background(
             RoundedRectangle(cornerRadius: DS.Radius.lg, style: .continuous)
                 .fill(Color.white)
         )
         .overlay(
             RoundedRectangle(cornerRadius: DS.Radius.lg, style: .continuous)
-                .strokeBorder(Color(.systemGray3).opacity(0.25), lineWidth: 0.5)
+                .strokeBorder(isFocused ? DS.ColorSet.brand : Color(.systemGray3).opacity(0.25), lineWidth: isFocused ? 2 : 0.5)
         )
         .shadow(color: Color.black.opacity(0.06), radius: 12, x: 0, y: 8)
-        .accessibilityLabel(Text("Search bar"))
+        .onTapGesture {
+            isFocused = true
+        }
+        .contentShape(Rectangle()) // Garante que toda a área seja clicável
     }
 }
