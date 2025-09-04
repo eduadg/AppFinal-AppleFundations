@@ -2,53 +2,61 @@ import SwiftUI
 
 public struct TipsCarousel: View {
     let items: [TipItem]
-    @State private var currentIndex: Int = 0
-    @State private var timer: Timer?
     @State private var offset: CGFloat = 0
+    @State private var timer: Timer?
     
     public init(items: [TipItem]) {
         self.items = items
     }
     
     public var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            LazyHStack(spacing: DS.Spacing.md) {
-                ForEach(Array(items.enumerated()), id: \.offset) { index, tip in
-                    TipsCard(tip: tip)
-                        .frame(width: 280)
-                }
-            }
-            .padding(.horizontal, DS.Spacing.md)
-            .offset(x: offset)
-        }
-        .onAppear {
-            startAutoScroll()
-        }
-        .onDisappear {
-            stopAutoScroll()
-        }
-    }
-    
-    private func startAutoScroll() {
-        timer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { _ in
-            withAnimation(.easeInOut(duration: 0.8)) {
-                currentIndex = (currentIndex + 1) % items.count
-                let cardWidth: CGFloat = 280 + DS.Spacing.md
-                offset = -CGFloat(currentIndex) * cardWidth
-                
-                // Quando chegar ao final, resetar para o início sem animação
-                if currentIndex == 0 {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                        withAnimation(.none) {
-                            offset = 0
-                        }
+        GeometryReader { geometry in
+            let cardWidth: CGFloat = 280 + DS.Spacing.md
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: DS.Spacing.md) {
+                    // Primeira sequência de cards
+                    ForEach(Array(items.enumerated()), id: \.offset) { index, tip in
+                        TipsCard(tip: tip)
+                            .frame(width: 280)
+                    }
+                    
+                    // Segunda sequência (duplicada para rolagem infinita)
+                    ForEach(Array(items.enumerated()), id: \.offset) { index, tip in
+                        TipsCard(tip: tip)
+                            .frame(width: 280)
                     }
                 }
+                .padding(.horizontal, DS.Spacing.md)
+                .offset(x: offset)
+            }
+            .disabled(true) // Desabilita scroll manual para manter o controle automático
+        }
+        .frame(height: 140) // Altura fixa para o carrossel
+        .onAppear {
+            startContinuousScroll()
+        }
+        .onDisappear {
+            stopContinuousScroll()
+        }
+    }
+    
+    private func startContinuousScroll() {
+        let cardWidth: CGFloat = 280 + DS.Spacing.md
+        
+        timer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { _ in
+            withAnimation(.linear(duration: 0.05)) {
+                offset -= 1 // Move 1 ponto para a esquerda a cada frame
+                
+                // Quando a primeira sequência sair completamente da tela
+                if offset <= -cardWidth * CGFloat(items.count) {
+                    offset = 0 // Reset para o início sem animação
+                }
             }
         }
     }
     
-    private func stopAutoScroll() {
+    private func stopContinuousScroll() {
         timer?.invalidate()
         timer = nil
     }
