@@ -51,9 +51,25 @@ public struct HomeView: View {
             VStack(spacing: 0) {
                 // Header customizado
                 HStack {
-                    Text("PlantSave")
-                        .font(.largeTitle.weight(.bold))
-                        .foregroundColor(DS.ColorSet.textPrimary)
+                    // Logo + Nome do App
+                    HStack(spacing: DS.Spacing.sm) {
+                        // Logo do App
+                        if let logoImage = UIImage(named: "logo SavePlant") {
+                            Image(uiImage: logoImage)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 32, height: 32)
+                        } else {
+                            // Fallback: ícone de folha
+                            Image(systemName: "leaf.fill")
+                                .font(.system(size: 32, weight: .bold))
+                                .foregroundColor(DS.ColorSet.brand)
+                        }
+                        
+                        Text("PlantSave")
+                            .font(.largeTitle.weight(.bold))
+                            .foregroundColor(DS.ColorSet.textPrimary)
+                    }
                     
                     Spacer()
                     
