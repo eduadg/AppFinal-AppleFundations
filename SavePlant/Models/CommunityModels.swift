@@ -151,12 +151,12 @@ public class CommunityDataManager: ObservableObject {
     
     public static let shared = CommunityDataManager()
     
-    private init() {
+    public init() {
         loadMockData()
     }
     
     public func likePost(_ post: CommunityPost) {
-        if let index = posts.firstIndex(where: { $0.id == post.id }) {
+        if posts.firstIndex(where: { $0.id == post.id }) != nil {
             // Como CommunityPost é struct, precisaríamos de uma abordagem diferente
             // Por enquanto, vamos manter o likes como está
         }

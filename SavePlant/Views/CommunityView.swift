@@ -26,7 +26,7 @@ public struct CommunityView: View {
                 ScrollView {
                     VStack(spacing: DS.Spacing.lg) {
                         // Search Bar
-                        SearchBarView(text: $searchText)
+                        CommunitySearchBarView(text: $searchText)
                             .padding(.horizontal, DS.Spacing.md)
                         
                         // Post Types Filter
@@ -67,8 +67,8 @@ public struct CommunityView: View {
     }
 }
 
-// MARK: - Search Bar
-struct SearchBarView: View {
+// MARK: - Community Search Bar
+struct CommunitySearchBarView: View {
     @Binding var text: String
     
     var body: some View {
@@ -343,7 +343,7 @@ struct AllPostsSection: View {
             .padding(.horizontal, DS.Spacing.md)
             
             if filteredPosts.isEmpty {
-                EmptyStateView(
+                CommunityEmptyStateView(
                     icon: "person.3.fill",
                     title: "Nenhum post encontrado",
                     message: searchText.isEmpty ? 
@@ -516,8 +516,8 @@ struct CommunityPostCard: View {
     }
 }
 
-// MARK: - Empty State View
-struct EmptyStateView: View {
+// MARK: - Community Empty State View
+struct CommunityEmptyStateView: View {
     let icon: String
     let title: String
     let message: String
