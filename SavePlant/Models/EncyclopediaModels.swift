@@ -113,6 +113,16 @@ public class EncyclopediaDataManager: ObservableObject {
         print("🔄 Inicializando EncyclopediaDataManager...")
         loadDefaultPosts()
         print("✅ EncyclopediaDataManager inicializado com \(posts.count) posts")
+        
+        // Verificação adicional
+        DispatchQueue.main.async {
+            print("🔄 Verificação assíncrona - Posts: \(self.posts.count)")
+            if self.posts.isEmpty {
+                print("⚠️ Posts ainda vazios, recarregando...")
+                self.loadDefaultPosts()
+                print("✅ Recarregamento assíncrono - Posts: \(self.posts.count)")
+            }
+        }
     }
     
     public func addPost(_ post: EncyclopediaPost) {

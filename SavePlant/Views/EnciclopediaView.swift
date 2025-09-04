@@ -1,7 +1,7 @@
 import SwiftUI
 
 public struct EnciclopediaView: View {
-    @ObservedObject private var encyclopediaData = EncyclopediaDataManager.shared
+    @StateObject private var encyclopediaData = EncyclopediaDataManager()
     @ObservedObject private var hospitalData = HospitalDataManager.shared
     @State private var searchText = ""
     @State private var selectedCategory: PostCategory?
@@ -93,6 +93,15 @@ public struct EnciclopediaView: View {
             if encyclopediaData.posts.isEmpty {
                 print("⚠️ Posts vazios, forçando reload...")
                 encyclopediaData.reloadData()
+                
+                // Verificação adicional após um delay
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    print("🔄 Verificação após delay - Posts: \(encyclopediaData.posts.count)")
+                    if encyclopediaData.posts.isEmpty {
+                        print("⚠️ Posts ainda vazios após reload, tentando novamente...")
+                        encyclopediaData.reloadData()
+                    }
+                }
             }
         }
     }
