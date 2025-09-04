@@ -71,9 +71,11 @@ public struct PlantDetailView: View {
                         .cornerRadius(DS.Radius.md)
                     }
                     
-                    Text("Diagnóstico em \(plant.diagnosisDate.formatted(.dateTime.day().month(.abbreviated).year()))")
-                        .font(.caption)
-                        .foregroundColor(DS.ColorSet.textSecondary)
+                                    let diagnosisDate = plant.diagnosisDate
+                let formattedDate = diagnosisDate.formatted(.dateTime.day().month(.abbreviated).year())
+                Text("Diagnóstico em \(formattedDate)")
+                    .font(.caption)
+                    .foregroundColor(DS.ColorSet.textSecondary)
                 }
                 
                 // Status Update Section (lê e atualiza direto da store pelo ID)
@@ -157,7 +159,8 @@ public struct PlantDetailView: View {
 
 private extension PlantDetailView {
     var currentHeaderStatus: PlantStatus {
-        hospitalData.plantsInTreatment.first(where: { $0.id == plant.id })?.status ?? plant.status
+        let currentStatus = hospitalData.plantsInTreatment.first(where: { $0.id == plant.id })?.status
+        return currentStatus ?? plant.status
     }
 }
 
@@ -202,7 +205,8 @@ struct StatusUpdateSection: View {
     }
 
     private var currentStatus: PlantStatus {
-        hospitalData.plantsInTreatment.first(where: { $0.id == plantId })?.status ?? .inTreatment
+        let status = hospitalData.plantsInTreatment.first(where: { $0.id == plantId })?.status
+        return status ?? .inTreatment
     }
 }
 
@@ -303,7 +307,8 @@ struct TimelineItem: View {
             // Date and notes
             VStack(alignment: .leading, spacing: DS.Spacing.xs) {
                 HStack {
-                    Text(analysis.date.formatted(.dateTime.day().month(.abbreviated).hour().minute()))
+                    let formattedTime = analysis.date.formatted(.dateTime.day().month(.abbreviated).hour().minute())
+                    Text(formattedTime)
                         .font(.subheadline.weight(.medium))
                         .foregroundColor(DS.ColorSet.textPrimary)
                     
@@ -350,7 +355,8 @@ struct PhotoPagerView: View {
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .tag(idx)
                         VStack(spacing: 6) {
-                            Text(analysis.date.formatted(.dateTime.day().month(.abbreviated).year().hour().minute()))
+                            let formattedDateTime = analysis.date.formatted(.dateTime.day().month(.abbreviated).year().hour().minute())
+                            Text(formattedDateTime)
                                 .font(.caption)
                                 .foregroundColor(.white.opacity(0.8))
                             if let notes = analysis.notes, !notes.isEmpty {

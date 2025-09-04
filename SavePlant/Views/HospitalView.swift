@@ -126,32 +126,36 @@ struct PlantCardRow: View {
             // Plant Info
             VStack(alignment: .leading, spacing: DS.Spacing.xs) {
                 HStack {
-                    Text(plant?.name ?? "")
-                        .font(.headline.weight(.semibold))
-                        .foregroundColor(DS.ColorSet.textPrimary)
-                    
-                    Spacer()
-                    
-                    // Status Badge
+                                    let plantName = plant?.name ?? ""
+                Text(plantName)
+                    .font(.headline.weight(.semibold))
+                    .foregroundColor(DS.ColorSet.textPrimary)
+                
+                Spacer()
+                
+                // Status Badge
+                let currentStatus = plant?.status ?? .inTreatment
                     HStack(spacing: 4) {
-                        Image(systemName: (plant?.status ?? .inTreatment).iconName)
+                        Image(systemName: currentStatus.iconName)
                             .font(.system(size: 12, weight: .medium))
                         
-                        Text((plant?.status ?? .inTreatment).rawValue)
+                        Text(currentStatus.rawValue)
                             .font(.caption.weight(.medium))
                     }
-                    .foregroundColor(Color((plant?.status ?? .inTreatment).color))
+                    .foregroundColor(Color(currentStatus.color))
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .background(Color((plant?.status ?? .inTreatment).color).opacity(0.1))
+                    .background(Color(currentStatus.color).opacity(0.1))
                     .cornerRadius(12)
                 }
                 
-                Text(plant?.disease ?? "")
+                let diseaseName = plant?.disease ?? ""
+                Text(diseaseName)
                     .font(.subheadline)
                     .foregroundColor(DS.ColorSet.textSecondary)
                 
-                Text("Última atualização: \( (plant?.lastUpdate ?? Date()).formatted(.dateTime.day().month(.abbreviated)) )")
+                let lastUpdate = plant?.lastUpdate ?? Date()
+                Text("Última atualização: \(lastUpdate.formatted(.dateTime.day().month(.abbreviated)))")
                     .font(.caption)
                     .foregroundColor(DS.ColorSet.textSecondary)
             }
@@ -193,9 +197,15 @@ struct AddPlantManuallyView: View {
     @State private var pickedFilename: String = ""
     
     private var isFormValid: Bool {
-        !plantName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
-        (selectedDisease != nil || (!customDisease.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !customTreatment.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)) &&
-        selectedPhoto != nil
+        let trimmedPlantName = plantName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedCustomDisease = customDisease.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedCustomTreatment = customTreatment.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        let hasPlantName = !trimmedPlantName.isEmpty
+        let hasDiseaseOrCustom = selectedDisease != nil || (!trimmedCustomDisease.isEmpty && !trimmedCustomTreatment.isEmpty)
+        let hasPhoto = selectedPhoto != nil
+        
+        return hasPlantName && hasDiseaseOrCustom && hasPhoto
     }
     
     var body: some View {
@@ -246,14 +256,10 @@ struct AddPlantManuallyView: View {
                             showingDiseasePicker: $showingDiseasePicker,
                             showingCustomDisease: $showingCustomDisease
                         )
-                        .onChange(of: selectedDisease) { oldValue, newValue in
-                            print("🔄 onChange triggered - oldValue: \(oldValue?.name ?? "nil"), newValue: \(newValue?.name ?? "nil")")
+                        .onChange(of: selectedDisease) { _, newValue in
                             if let disease = newValue {
-                                print("🔄 onChange triggered - Doença: \(disease.name)")
-                                // Sempre sincroniza tratamento com a doença selecionada
                                 self.customTreatment = disease.treatment
                                 self.customDisease = disease.name
-                                print("✅ onChange sincronizou - Doença: \(self.customDisease), Tratamento: \(self.customTreatment)")
                             }
                         }
                         
@@ -473,8 +479,9 @@ struct AddPlantManuallyView: View {
             print("✅ Usando doença customizada: \(diseaseName)")
         }
         
+        let trimmedPlantName = plantName.trimmingCharacters(in: .whitespacesAndNewlines)
         let plant = PlantInTreatment(
-            name: plantName.trimmingCharacters(in: .whitespacesAndNewlines),
+            name: trimmedPlantName,
             disease: diseaseName,
             photo: photo,
             treatment: treatment
@@ -628,9 +635,10 @@ struct SuggestedDiseasesSection: View {
     }
     
     var body: some View {
-        if !plantName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        let trimmedPlantName = plantName.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmedPlantName.isEmpty {
             VStack(spacing: DS.Spacing.md) {
-                Text("Sugestões de Doenças para \(plantName)")
+                Text("Sugestões de Doenças para \(trimmedPlantName)")
                     .font(.headline.weight(.semibold))
                     .foregroundColor(DS.ColorSet.textPrimary)
                     .frame(maxWidth: .infinity, alignment: .leading)

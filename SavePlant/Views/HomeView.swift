@@ -153,7 +153,8 @@ public struct HomeView: View {
                                             Text("Hospital")
                                                 .font(.headline.weight(.bold))
                                                 .foregroundColor(.white)
-                                            Text("\(HospitalDataManager.shared.plantsInTreatment.filter { $0.status == .inTreatment }.count) em tratamento")
+                                            let plantsInTreatment = HospitalDataManager.shared.plantsInTreatment.filter { $0.status == .inTreatment }.count
+                                            Text("\(plantsInTreatment) em tratamento")
                                                 .font(.caption)
                                                 .foregroundColor(.white.opacity(0.8))
                                         }

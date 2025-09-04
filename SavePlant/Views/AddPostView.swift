@@ -150,14 +150,16 @@ public struct AddPostView: View {
 # Minha Experiência com \(plant.name)
 
 ## Situação Inicial
-Minha planta \(plant.name) foi diagnosticada com **\(plant.disease)** em \(plant.diagnosisDate.formatted(.dateTime.day().month(.abbreviated).year())).
+                let formattedDiagnosisDate = plant.diagnosisDate.formatted(.dateTime.day().month(.abbreviated).year())
+                Minha planta \(plant.name) foi diagnosticada com **\(plant.disease)** em \(formattedDiagnosisDate).
 
 ## Tratamento Aplicado
 \(plant.treatment)
 
 ## Observações
 - Status atual: \(plant.status.rawValue)
-- Última atualização: \(plant.lastUpdate.formatted(.dateTime.day().month(.abbreviated).year()))
+                let formattedLastUpdate = plant.lastUpdate.formatted(.dateTime.day().month(.abbreviated).year())
+                - Última atualização: \(formattedLastUpdate)
 
 ## Dicas Importantes
 [Adicione suas dicas e observações aqui]
