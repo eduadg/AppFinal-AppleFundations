@@ -8,7 +8,12 @@ public struct HomeView: View {
     private let tipsData: [TipItem] = [
         .init(title: "Evite molhar folhas à noite", description: "A umidade noturna favorece o desenvolvimento de fungos", icon: "moon.stars.fill"),
         .init(title: "Podar partes doentes", description: "Remova folhas e galhos infectados para evitar propagação", icon: "scissors"),
-        .init(title: "Rotacione culturas", description: "Alterne os tipos de plantas para manter o solo saudável", icon: "arrow.triangle.2.circlepath")
+        .init(title: "Rotacione culturas", description: "Alterne os tipos de plantas para manter o solo saudável", icon: "arrow.triangle.2.circlepath"),
+        .init(title: "Use água morna", description: "Água muito fria pode causar choque térmico nas raízes", icon: "thermometer"),
+        .init(title: "Adube na primavera", description: "Época ideal para fornecer nutrientes essenciais", icon: "leaf.fill"),
+        .init(title: "Mantenha distância", description: "Evite aglomeração de plantas para melhor circulação de ar", icon: "arrow.left.and.right"),
+        .init(title: "Limpe as ferramentas", description: "Desinfete tesouras e pás entre usos", icon: "sparkles"),
+        .init(title: "Observe as folhas", description: "Mudanças de cor podem indicar problemas nutricionais", icon: "eye.fill")
     ]
 
 

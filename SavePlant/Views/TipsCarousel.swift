@@ -44,9 +44,9 @@ public struct TipsCarousel: View {
     private func startContinuousScroll() {
         let cardWidth: CGFloat = 280 + DS.Spacing.md
         
-        timer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { _ in
-            withAnimation(.linear(duration: 0.05)) {
-                offset -= 1 // Move 1 ponto para a esquerda a cada frame
+        timer = Timer.scheduledTimer(withTimeInterval: 0.033, repeats: true) { _ in // Aumentado em 50% (de 0.05 para 0.033)
+            withAnimation(.linear(duration: 0.033)) {
+                offset -= 1.5 // Aumentado em 50% (de 1 para 1.5)
                 
                 // Quando a primeira sequência sair completamente da tela
                 if offset <= -cardWidth * CGFloat(items.count) {
@@ -66,13 +66,13 @@ struct TipsCard: View {
     let tip: TipItem
     
     var body: some View {
-        VStack(alignment: .leading, spacing: DS.Spacing.sm) {
+        VStack(alignment: .center, spacing: DS.Spacing.sm) { // Mudado para .center
             // Título da dica
             Text(tip.title)
                 .font(.headline.weight(.semibold))
                 .foregroundColor(DS.ColorSet.textPrimary)
                 .lineLimit(2)
-                .multilineTextAlignment(.leading)
+                .multilineTextAlignment(.center) // Mudado para .center
                 .fixedSize(horizontal: false, vertical: true)
             
             // Descrição
@@ -80,13 +80,13 @@ struct TipsCard: View {
                 .font(.body)
                 .foregroundColor(DS.ColorSet.textSecondary)
                 .lineLimit(3)
-                .multilineTextAlignment(.leading)
+                .multilineTextAlignment(.center) // Mudado para .center
                 .fixedSize(horizontal: false, vertical: true)
             
             Spacer(minLength: 0)
         }
         .padding(DS.Spacing.md)
-        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .frame(maxWidth: .infinity, alignment: .center) // Mudado para .center
         .frame(height: 120)
         .background(Color.white)
         .cornerRadius(DS.Radius.lg)
