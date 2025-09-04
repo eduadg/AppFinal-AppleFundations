@@ -3,10 +3,12 @@ import SwiftUI
 public struct SearchBar: View {
     @Binding var text: String
     var placeholder: String
+    var onSearch: (() -> Void)?
     
-    public init(text: Binding<String>, placeholder: String = "Search") {
+    public init(text: Binding<String>, placeholder: String = "Search", onSearch: (() -> Void)? = nil) {
         self._text = text
         self.placeholder = placeholder
+        self.onSearch = onSearch
     }
     
     public var body: some View {
@@ -18,6 +20,19 @@ public struct SearchBar: View {
             TextField(placeholder, text: $text)
                 .textInputAutocapitalization(.never)
                 .disableAutocorrection(true)
+                .onSubmit {
+                    onSearch?()
+                }
+            
+            if !text.isEmpty {
+                Button(action: {
+                    text = ""
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.secondary)
+                        .font(.system(size: 16))
+                }
+            }
         }
         .padding(.vertical, DS.Spacing.sm)
         .padding(.horizontal, DS.Spacing.md)
