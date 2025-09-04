@@ -113,6 +113,7 @@ public class EncyclopediaDataManager: ObservableObject {
         print("🔄 Inicializando EncyclopediaDataManager...")
         loadDefaultPosts()
         print("✅ EncyclopediaDataManager inicializado com \(posts.count) posts")
+        print("✅ Featured posts: \(featuredPosts.count)")
         
         // Verificação adicional
         DispatchQueue.main.async {
@@ -178,6 +179,7 @@ public class EncyclopediaDataManager: ObservableObject {
     }
     
     private func loadDefaultPosts() {
+        print("🔄 Carregando posts padrão...")
         posts = [
             // Curiosidades
             EncyclopediaPost(
@@ -863,6 +865,8 @@ public class EncyclopediaDataManager: ObservableObject {
             )
         ]
         
+        print("✅ Posts carregados: \(posts.count)")
         updateFeaturedPosts()
+        print("✅ Featured posts atualizados: \(featuredPosts.count)")
     }
 }

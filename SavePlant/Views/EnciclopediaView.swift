@@ -27,18 +27,19 @@ public struct EnciclopediaView: View {
                 ScrollView {
                     VStack(spacing: DS.Spacing.lg) {
                         // Debug info
-                        if encyclopediaData.posts.isEmpty {
-                            VStack {
-                                Text("🐛 Debug: \(encyclopediaData.posts.count) posts carregados")
-                                    .font(.caption)
-                                    .foregroundColor(.red)
-                                Button("Recarregar") {
-                                    print("🔄 Tentando recarregar posts...")
-                                    encyclopediaData.reloadData()
-                                }
+                        VStack {
+                            Text("🐛 Debug: \(encyclopediaData.posts.count) posts carregados")
+                                .font(.caption)
+                                .foregroundColor(.red)
+                            Text("Featured: \(encyclopediaData.featuredPosts.count)")
+                                .font(.caption)
+                                .foregroundColor(.red)
+                            Button("Recarregar") {
+                                print("🔄 Tentando recarregar posts...")
+                                encyclopediaData.reloadData()
                             }
-                            .padding()
                         }
+                        .padding()
                         
                         // Search Bar
                         SearchBarView(text: $searchText)
@@ -51,18 +52,22 @@ public struct EnciclopediaView: View {
                         
                         // Featured Posts (when no search/category)
                         if searchText.isEmpty && selectedCategory == nil {
-                            FeaturedPostsSection()
+                            FeaturedPostsSection(encyclopediaData: encyclopediaData)
                         }
                         
                         // Posts List
                         PostsListSection(
                             searchText: searchText,
-                            selectedCategory: selectedCategory
+                            selectedCategory: selectedCategory,
+                            encyclopediaData: encyclopediaData
                         )
                         
                         // Hospital Integration Section
                         if !hospitalData.plantsInTreatment.isEmpty && searchText.isEmpty && selectedCategory == nil {
-                            HospitalIntegrationSection()
+                            HospitalIntegrationSection(
+                                encyclopediaData: encyclopediaData,
+                                hospitalData: hospitalData
+                            )
                         }
                         
                         Spacer(minLength: 100)
@@ -87,7 +92,6 @@ public struct EnciclopediaView: View {
         .sheet(isPresented: $showingAddPost) {
             AddPostView()
         }
-        .environmentObject(encyclopediaData)
         .onAppear {
             print("🔄 EnciclopediaView onAppear - Posts: \(encyclopediaData.posts.count)")
             if encyclopediaData.posts.isEmpty {
@@ -207,7 +211,7 @@ struct CategoryCard: View {
 
 // MARK: - Featured Posts Section
 struct FeaturedPostsSection: View {
-    @EnvironmentObject var encyclopediaData: EncyclopediaDataManager
+    @ObservedObject var encyclopediaData: EncyclopediaDataManager
     
     var body: some View {
         VStack(alignment: .leading, spacing: DS.Spacing.md) {
@@ -300,7 +304,7 @@ struct FeaturedPostCard: View {
 struct PostsListSection: View {
     let searchText: String
     let selectedCategory: PostCategory?
-    @EnvironmentObject var encyclopediaData: EncyclopediaDataManager
+    @ObservedObject var encyclopediaData: EncyclopediaDataManager
     
     private var filteredPosts: [EncyclopediaPost] {
         var posts = encyclopediaData.posts
@@ -438,8 +442,8 @@ struct PostListCard: View {
 
 // MARK: - Hospital Integration Section
 struct HospitalIntegrationSection: View {
-    @EnvironmentObject var encyclopediaData: EncyclopediaDataManager
-    @EnvironmentObject var hospitalData: HospitalDataManager
+    @ObservedObject var encyclopediaData: EncyclopediaDataManager
+    @ObservedObject var hospitalData: HospitalDataManager
     
     private var suggestedPosts: [EncyclopediaPost] {
         var suggestions: [EncyclopediaPost] = []
