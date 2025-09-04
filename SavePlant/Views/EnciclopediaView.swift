@@ -1,6 +1,10 @@
 import SwiftUI
 
 public struct EnciclopediaView: View {
+    @StateObject private var enciclopediaData = EnciclopediaDataManager.shared
+    @State private var showingAddPost = false
+    @State private var selectedPost: EnciclopediaPost?
+    
     public init() {}
     
     public var body: some View {
@@ -18,30 +22,139 @@ public struct EnciclopediaView: View {
                 )
                 .ignoresSafeArea()
                 
-                VStack(spacing: DS.Spacing.lg) {
-                    Spacer()
-                    
-                    Image(systemName: "book.pages.fill")
-                        .font(.system(size: 64))
-                        .foregroundColor(DS.ColorSet.textSecondary)
-                    
+                VStack(spacing: 0) {
+                    // Search Bar
                     VStack(spacing: DS.Spacing.sm) {
-                        Text("Enciclopédia")
-                            .font(.title2.weight(.semibold))
-                            .foregroundColor(DS.ColorSet.textPrimary)
+                        HStack {
+                            Image(systemName: "magnifyingglass")
+                                .foregroundColor(DS.ColorSet.textSecondary)
+                            
+                            TextField("Buscar posts...", text: $enciclopediaData.searchText)
+                                .textFieldStyle(PlainTextFieldStyle())
+                                .onChange(of: enciclopediaData.searchText) { _, _ in
+                                    enciclopediaData.filterPosts()
+                                }
+                            
+                            if !enciclopediaData.searchText.isEmpty {
+                                Button(action: {
+                                    enciclopediaData.searchText = ""
+                                    enciclopediaData.filterPosts()
+                                }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundColor(DS.ColorSet.textSecondary)
+                                }
+                            }
+                        }
+                        .padding(.horizontal, DS.Spacing.md)
+                        .padding(.vertical, DS.Spacing.sm)
+                        .background(Color.white)
+                        .cornerRadius(DS.Radius.md)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: DS.Radius.md)
+                                .stroke(DS.ColorSet.brand.opacity(0.2), lineWidth: 1)
+                        )
+                        .padding(.horizontal, DS.Spacing.md)
                         
-                        Text("Doenças e Tratamentos")
-                            .font(.body)
-                            .foregroundColor(DS.ColorSet.textSecondary)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, DS.Spacing.xl)
+                        // Category Filter
+                        CategoryFilterView(
+                            selectedCategory: $enciclopediaData.selectedCategory,
+                            onCategorySelected: { _ in
+                                enciclopediaData.filterPosts()
+                            }
+                        )
                     }
+                    .padding(.top, DS.Spacing.sm)
                     
-                    Spacer()
+                    // Posts List
+                    if enciclopediaData.filteredPosts.isEmpty {
+                        // Empty State
+                        VStack(spacing: DS.Spacing.lg) {
+                            Spacer()
+                            
+                            Image(systemName: "doc.text.magnifyingglass")
+                                .font(.system(size: 64))
+                                .foregroundColor(DS.ColorSet.textSecondary)
+                            
+                            VStack(spacing: DS.Spacing.sm) {
+                                Text("Nenhum post encontrado")
+                                    .font(.title2.weight(.semibold))
+                                    .foregroundColor(DS.ColorSet.textPrimary)
+                                
+                                Text("Tente ajustar os filtros ou adicione um novo post")
+                                    .font(.body)
+                                    .foregroundColor(DS.ColorSet.textSecondary)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal, DS.Spacing.xl)
+                            }
+                            
+                            Spacer()
+                        }
+                    } else {
+                        ScrollView {
+                            LazyVStack(spacing: DS.Spacing.md) {
+                                ForEach(enciclopediaData.filteredPosts) { post in
+                                    EnciclopediaPostCard(
+                                        post: post,
+                                        onLike: {
+                                            enciclopediaData.likePost(post.id)
+                                        },
+                                        onTap: {
+                                            selectedPost = post
+                                        }
+                                    )
+                                }
+                            }
+                            .padding(.horizontal, DS.Spacing.md)
+                            .padding(.vertical, DS.Spacing.md)
+                        }
+                    }
                 }
             }
             .navigationTitle("Enciclopédia")
             .navigationBarTitleDisplayMode(.large)
+            .overlay(
+                // Floating Action Button
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        Button(action: {
+                            showingAddPost = true
+                        }) {
+                            HStack(spacing: DS.Spacing.xs) {
+                                Image(systemName: "plus")
+                                    .font(.system(size: 16, weight: .semibold))
+                                Text("Novo Post")
+                                    .font(.subheadline.weight(.semibold))
+                            }
+                            .foregroundColor(.white)
+                            .padding(.horizontal, DS.Spacing.md)
+                            .padding(.vertical, DS.Spacing.sm)
+                            .background(DS.ColorSet.brand)
+                            .clipShape(Capsule())
+                            .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+                        }
+                        .padding(.trailing, DS.Spacing.lg)
+                        .padding(.bottom, DS.Spacing.lg)
+                    }
+                }
+            )
         }
+        .sheet(isPresented: $showingAddPost) {
+            AddPostView()
+        }
+        .sheet(item: $selectedPost) { post in
+            PostDetailView(post: post)
+        }
+        .onAppear {
+            enciclopediaData.filterPosts()
+        }
+    }
+}
+
+// MARK: - Preview
+struct EnciclopediaView_Previews: PreviewProvider {
+    static var previews: some View {
+        EnciclopediaView()
     }
 }
