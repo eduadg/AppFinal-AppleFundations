@@ -26,131 +26,131 @@ public struct PlantDetailView: View {
                     VStack(alignment: .leading, spacing: DS.Spacing.lg) {
                         // Main Photo Section
                         if let latestPhoto = currentPlant.latestPhoto {
-                    Image(uiImage: latestPhoto)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 260)
-                        .clipShape(RoundedRectangle(cornerRadius: DS.Radius.lg))
-                        .contentShape(RoundedRectangle(cornerRadius: DS.Radius.lg))
-                } else {
-                    RoundedRectangle(cornerRadius: DS.Radius.lg)
-                        .fill(Color(.systemGray6))
-                        .frame(height: 300)
-                        .overlay(
-                            VStack {
-                                Image(systemName: "photo")
-                                    .font(.system(size: 48))
-                                    .foregroundColor(.secondary)
-                                Text("Nenhuma foto disponível")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+                            Image(uiImage: latestPhoto)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 260)
+                                .clipShape(RoundedRectangle(cornerRadius: DS.Radius.lg))
+                                .contentShape(RoundedRectangle(cornerRadius: DS.Radius.lg))
+                        } else {
+                            RoundedRectangle(cornerRadius: DS.Radius.lg)
+                                .fill(Color(.systemGray6))
+                                .frame(height: 300)
+                                .overlay(
+                                    VStack {
+                                        Image(systemName: "photo")
+                                            .font(.system(size: 48))
+                                            .foregroundColor(.secondary)
+                                        Text("Nenhuma foto disponível")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                )
+                        }
+                        
+                        // Plant Info Header
+                        VStack(alignment: .leading, spacing: DS.Spacing.sm) {
+                            HStack {
+                                VStack(alignment: .leading, spacing: DS.Spacing.xs) {
+                                    Text(currentPlant.name)
+                                        .font(.title.weight(.bold))
+                                        .foregroundColor(DS.ColorSet.textPrimary)
+                                    
+                                    Text(currentPlant.disease)
+                                        .font(.headline)
+                                        .foregroundColor(DS.ColorSet.textSecondary)
+                                }
+                                
+                                Spacer()
+                                
+                                // Status Indicator
+                                VStack(spacing: DS.Spacing.xs) {
+                                    Image(systemName: currentHeaderStatus.iconName)
+                                        .font(.system(size: 24, weight: .semibold))
+                                        .foregroundColor(Color(currentHeaderStatus.color))
+                                    
+                                    Text(currentHeaderStatus.rawValue)
+                                        .font(.caption.weight(.medium))
+                                        .foregroundColor(Color(currentHeaderStatus.color))
+                                }
+                                .padding(DS.Spacing.md)
+                                .background(Color(currentHeaderStatus.color).opacity(0.1))
+                                .cornerRadius(DS.Radius.md)
                             }
-                        )
-                }
-                
-                // Plant Info Header
-                VStack(alignment: .leading, spacing: DS.Spacing.sm) {
-                    HStack {
-                        VStack(alignment: .leading, spacing: DS.Spacing.xs) {
-                            Text(plant.name)
-                                .font(.title.weight(.bold))
-                                .foregroundColor(DS.ColorSet.textPrimary)
                             
-                            Text(plant.disease)
-                                .font(.headline)
+                            let diagnosisDate = currentPlant.diagnosisDate
+                            let formattedDate = diagnosisDate.formatted(.dateTime.day().month(.abbreviated).year())
+                            Text("Diagnóstico em \(formattedDate)")
+                                .font(.caption)
                                 .foregroundColor(DS.ColorSet.textSecondary)
                         }
                         
-                        Spacer()
+                        // Status Update Section (lê e atualiza direto da store pelo ID)
+                        StatusUpdateSection(plantId: currentPlant.id)
                         
-                        // Status Indicator
-                        VStack(spacing: DS.Spacing.xs) {
-                            Image(systemName: currentHeaderStatus.iconName)
-                                .font(.system(size: 24, weight: .semibold))
-                                .foregroundColor(Color(currentHeaderStatus.color))
-                            
-                            Text(currentHeaderStatus.rawValue)
-                                .font(.caption.weight(.medium))
-                                .foregroundColor(Color(currentHeaderStatus.color))
+                        // Treatment Section
+                        TreatmentSection(treatment: currentPlant.treatment)
+                        
+                        // Timeline Section (tap para abrir galeria)
+                        TimelineSection(analyses: currentPlant.timeline, onSelectIndex: { idx in
+                            self.galleryIndex = idx
+                            self.showingGallery = true
+                        })
+                        
+                        // Add Photo Button
+                        Button(action: {
+                            showingAddPhoto = true
+                        }) {
+                            HStack {
+                                Image(systemName: "camera.fill")
+                                    .font(.system(size: 16, weight: .semibold))
+                                
+                                Text("Adicionar nova foto")
+                                    .font(.headline.weight(.semibold))
+                            }
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(DS.Spacing.md)
+                            .background(DS.ColorSet.brand)
+                            .cornerRadius(DS.Radius.md)
                         }
-                        .padding(DS.Spacing.md)
-                        .background(Color(currentHeaderStatus.color).opacity(0.1))
-                        .cornerRadius(DS.Radius.md)
+                        .padding(.top, DS.Spacing.md)
                     }
-                    
-                                    let diagnosisDate = currentPlant.diagnosisDate
-                let formattedDate = diagnosisDate.formatted(.dateTime.day().month(.abbreviated).year())
-                Text("Diagnóstico em \(formattedDate)")
-                    .font(.caption)
-                    .foregroundColor(DS.ColorSet.textSecondary)
+                    .padding(DS.Spacing.md)
                 }
-                
-                // Status Update Section (lê e atualiza direto da store pelo ID)
-                StatusUpdateSection(plantId: currentPlant.id)
-                
-                // Treatment Section
-                TreatmentSection(treatment: currentPlant.treatment)
-                
-                // Timeline Section (tap para abrir galeria)
-                TimelineSection(analyses: currentPlant.timeline, onSelectIndex: { idx in
-                    self.galleryIndex = idx
-                    self.showingGallery = true
-                })
-                
-                // Add Photo Button
-                Button(action: {
-                    showingAddPhoto = true
-                }) {
-                    HStack {
-                        Image(systemName: "camera.fill")
-                            .font(.system(size: 16, weight: .semibold))
-                        
-                        Text("Adicionar nova foto")
-                            .font(.headline.weight(.semibold))
+                .navigationTitle("Detalhes da Planta")
+            } else {
+                // Planta não encontrada
+                VStack(spacing: DS.Spacing.lg) {
+                    Spacer()
+                    Image(systemName: "exclamationmark.triangle")
+                        .font(.system(size: 64))
+                        .foregroundColor(.orange)
+                    
+                    Text("Planta não encontrada")
+                        .font(.title2.weight(.semibold))
+                        .foregroundColor(DS.ColorSet.textPrimary)
+                    
+                    Text("A planta pode ter sido removida ou não está mais disponível")
+                        .font(.body)
+                        .foregroundColor(DS.ColorSet.textSecondary)
+                        .multilineTextAlignment(.center)
+                    
+                    Button("Voltar") {
+                        dismiss()
                     }
                     .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(DS.Spacing.md)
+                    .padding(.horizontal, DS.Spacing.lg)
+                    .padding(.vertical, DS.Spacing.md)
                     .background(DS.ColorSet.brand)
                     .cornerRadius(DS.Radius.md)
+                    
+                    Spacer()
                 }
-                .padding(.top, DS.Spacing.md)
+                .padding(DS.Spacing.lg)
             }
-            .padding(DS.Spacing.md)
         }
-        .navigationTitle("Detalhes da Planta")
-    } else {
-        // Planta não encontrada
-        VStack(spacing: DS.Spacing.lg) {
-            Spacer()
-            Image(systemName: "exclamationmark.triangle")
-                .font(.system(size: 64))
-                .foregroundColor(.orange)
-            
-            Text("Planta não encontrada")
-                .font(.title2.weight(.semibold))
-                .foregroundColor(DS.ColorSet.textPrimary)
-            
-            Text("A planta pode ter sido removida ou não está mais disponível")
-                .font(.body)
-                .foregroundColor(DS.ColorSet.textSecondary)
-                .multilineTextAlignment(.center)
-            
-            Button("Voltar") {
-                dismiss()
-            }
-            .foregroundColor(.white)
-            .padding(.horizontal, DS.Spacing.lg)
-            .padding(.vertical, DS.Spacing.md)
-            .background(DS.ColorSet.brand)
-            .cornerRadius(DS.Radius.md)
-            
-            Spacer()
-        }
-        .padding(DS.Spacing.lg)
-    }
-}
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingAddPhoto) {
             ImagePicker(selectedImage: $newPhoto, sourceType: .photoLibrary)
