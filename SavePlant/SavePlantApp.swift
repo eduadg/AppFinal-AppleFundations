@@ -13,6 +13,8 @@ struct SavePlantApp: App {
         WindowGroup {
             RootTabView()
                 .environmentObject(router)
+                .environmentObject(HospitalDataManager.shared)
+                .environmentObject(EncyclopediaDataManager.shared)
                 .onAppear {
                     // Injeta o contexto SwiftData no manager
                     if let context = container.mainContext as ModelContext? {

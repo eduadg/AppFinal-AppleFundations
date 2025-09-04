@@ -73,7 +73,6 @@ public struct EnciclopediaView: View {
         .sheet(isPresented: $showingAddPost) {
             AddPostView()
         }
-        .environmentObject(encyclopediaData)
     }
 }
 
