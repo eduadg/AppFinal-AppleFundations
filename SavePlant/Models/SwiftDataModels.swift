@@ -60,16 +60,50 @@ extension StoredPlant {
 // MARK: - Mapping helpers
 extension PlantInTreatment {
     init?(stored: StoredPlant) {
+        // Verifica se os dados essenciais existem
+        guard !stored.name.isEmpty,
+              !stored.disease.isEmpty,
+              !stored.treatment.isEmpty,
+              !stored.analyses.isEmpty else {
+            print("⚠️ StoredPlant com dados inválidos: name=\(stored.name), disease=\(stored.disease), treatment=\(stored.treatment), analyses=\(stored.analyses.count)")
+            return nil
+        }
+        
+        // Converte análises com verificação de segurança
         let uiAnalyses: [PlantAnalysis] = stored.analyses.compactMap { analysis in
-            guard let image = UIImage(data: analysis.photoData) else { return nil }
+            guard let image = UIImage(data: analysis.photoData) else { 
+                print("⚠️ Falha ao converter photoData para UIImage")
+                return nil 
+            }
             return PlantAnalysis(photo: image, date: analysis.date, notes: analysis.notes)
         }
-        guard let latest = uiAnalyses.last?.photo else { return nil }
-        var plant = PlantInTreatment(name: stored.name, disease: stored.disease, status: stored.status, photo: latest, treatment: stored.treatment)
+        
+        // Verifica se há pelo menos uma análise válida
+        guard let latest = uiAnalyses.last?.photo else { 
+            print("⚠️ Nenhuma análise válida encontrada para planta: \(stored.name)")
+            return nil 
+        }
+        
+        // Cria a planta com verificação de status
+        let plantStatus = stored.status
+        var plant = PlantInTreatment(
+            name: stored.name, 
+            disease: stored.disease, 
+            status: plantStatus, 
+            photo: latest, 
+            treatment: stored.treatment
+        )
+        
+        // Define propriedades adicionais
         plant.id = stored.id
         plant.diagnosisDate = stored.diagnosisDate
         plant.lastUpdate = stored.lastUpdate
-        for a in uiAnalyses.dropFirst() { plant.addAnalysis(a) }
+        
+        // Adiciona análises adicionais
+        for analysis in uiAnalyses.dropFirst() { 
+            plant.addAnalysis(analysis) 
+        }
+        
         self = plant
     }
 }

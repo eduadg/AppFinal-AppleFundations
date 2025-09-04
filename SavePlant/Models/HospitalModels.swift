@@ -221,12 +221,26 @@ public class HospitalDataManager: ObservableObject {
     // MARK: - Mock Data
     // MARK: - SwiftData Persistence
     private func loadFromStorage() {
-        guard let context = context else { return }
+        guard let context = context else { 
+            print("⚠️ Contexto SwiftData não inicializado")
+            return 
+        }
         do {
             let stored: [StoredPlant] = try context.fetch(FetchDescriptor<StoredPlant>())
-            let mapped: [PlantInTreatment] = stored.compactMap { PlantInTreatment(stored: $0) }
+            print("📱 Carregando \(stored.count) plantas do SwiftData")
+            
+            let mapped: [PlantInTreatment] = stored.compactMap { storedPlant in
+                guard let plant = PlantInTreatment(stored: storedPlant) else {
+                    print("⚠️ Falha ao converter StoredPlant para PlantInTreatment: \(storedPlant.name)")
+                    return nil
+                }
+                return plant
+            }
+            
+            print("✅ \(mapped.count) plantas convertidas com sucesso")
             self.plantsInTreatment = mapped
         } catch {
+            print("❌ Erro ao carregar plantas do SwiftData: \(error)")
             self.plantsInTreatment = []
         }
     }

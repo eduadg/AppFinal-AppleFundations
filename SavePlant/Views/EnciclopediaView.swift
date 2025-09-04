@@ -413,13 +413,25 @@ struct HospitalIntegrationSection: View {
     private var suggestedPosts: [EncyclopediaPost] {
         var suggestions: [EncyclopediaPost] = []
         
+        // Verifica se há plantas em tratamento
+        guard !hospitalData.plantsInTreatment.isEmpty else {
+            return []
+        }
+        
         for plant in hospitalData.plantsInTreatment {
+            // Verifica se o nome da planta é válido
+            guard !plant.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                print("⚠️ Planta com nome vazio encontrada: \(plant.id)")
+                continue
+            }
+            
             let relatedPosts = encyclopediaData.getPostsRelatedToPlant(plant.name)
             suggestions.append(contentsOf: relatedPosts)
         }
         
         // Remove duplicatas e limita a 3
-        return Array(Set(suggestions)).prefix(3).map { $0 }
+        let uniqueSuggestions = Array(Set(suggestions))
+        return Array(uniqueSuggestions.prefix(3))
     }
     
     var body: some View {

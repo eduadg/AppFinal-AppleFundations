@@ -101,7 +101,21 @@ struct PlantCardRow: View {
     @StateObject private var hospitalData = HospitalDataManager.shared
     
     private var plant: PlantInTreatment? {
-        hospitalData.plantsInTreatment.first(where: { $0.id == plantId })
+        // Verifica se há plantas em tratamento
+        guard !hospitalData.plantsInTreatment.isEmpty else { return nil }
+        
+        // Busca a planta com verificação de segurança
+        let foundPlant = hospitalData.plantsInTreatment.first(where: { $0.id == plantId })
+        
+        // Verifica se a planta encontrada tem dados válidos
+        guard let plant = foundPlant,
+              !plant.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+              !plant.disease.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            print("⚠️ Planta encontrada mas com dados inválidos: \(plantId)")
+            return nil
+        }
+        
+        return plant
     }
     
     var body: some View {
@@ -192,8 +206,6 @@ struct AddPlantManuallyView: View {
     // Estados para identificação de planta
     @State private var isIdentifyingPlant = false
     @State private var plantIdentificationResult: PlantInfo?
-    @State private var showingPlantIdentificationAlert = false
-    @State private var plantIdentificationError: String?
     @State private var pickedFilename: String = ""
     
     private var isFormValid: Bool {
@@ -300,28 +312,26 @@ struct AddPlantManuallyView: View {
                 customTreatment: $customTreatment
             )
         }
-        .alert("Erro na Identificação", isPresented: $showingPlantIdentificationAlert) {
-            Button("OK") { }
-        } message: {
-            Text(plantIdentificationError ?? "Erro desconhecido na identificação da planta")
-        }
+        // Alert removido - não mostra mais erro de identificação
         .onChange(of: selectedPhoto) { oldValue, newValue in
             guard let newImage = newValue else { return }
             
-            // 1) Regras fake por nome de arquivo, se disponível
-            if let rule = FakePlantRules.match(from: pickedFilename) {
-                applyFakeRule(rule)
-            } else {
-                // 2) Tenta API PlantNet
-                identifyPlant(newImage)
-            }
-            
-            // Identificar a planta primeiro
-            // (feito acima)
-            
-            // Depois classificar a doença (se o classificador estiver disponível)
-            if let classifier = PlantDiseaseClassifier.shared {
-                classifyDisease(newImage, using: classifier)
+            // Identificação silenciosa em background
+            DispatchQueue.global(qos: .background).async {
+                // 1) Regras fake por nome de arquivo, se disponível
+                if let rule = FakePlantRules.match(from: self.pickedFilename) {
+                    DispatchQueue.main.async {
+                        self.applyFakeRule(rule)
+                    }
+                } else {
+                    // 2) Tenta API PlantNet (sem bloquear UI)
+                    self.identifyPlant(newImage)
+                }
+                
+                // 3) Classificar doença em background (se disponível)
+                if let classifier = PlantDiseaseClassifier.shared {
+                    self.classifyDisease(newImage, using: classifier)
+                }
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .imagePickerSelectedFileName)) { notification in
@@ -353,7 +363,8 @@ struct AddPlantManuallyView: View {
                     scientificInfo += "\nConfiança: \(Int(plantInfo.confidence * 100))%"
                     self.notes = scientificInfo
                 case .failure:
-                    // Fallback offline com modelo local
+                    // Fallback offline com modelo local (sem mostrar erro)
+                    print("⚠️ API PlantNet falhou, tentando identificação offline")
                     self.fallbackIdentifyWithLocalModel(image)
                 }
             }
@@ -364,20 +375,22 @@ struct AddPlantManuallyView: View {
     private func fallbackIdentifyWithLocalModel(_ image: UIImage) {
         guard let classifier = PlantDiseaseClassifier.shared else {
             self.isIdentifyingPlant = false
-            self.plantIdentificationError = "Não foi possível inicializar o classificador local."
-            self.showingPlantIdentificationAlert = true
+            // Não mostra erro, apenas silenciosamente falha
+            print("⚠️ Classificador local não disponível")
             return
         }
+        
         classifier.classify(image) { pred in
             DispatchQueue.main.async {
                 self.isIdentifyingPlant = false
+                
+                // Se não conseguir identificar, não mostra erro
                 guard let pred = pred else {
-                    self.plantIdentificationError = "Falha na identificação offline."
-                    self.showingPlantIdentificationAlert = true
+                    print("⚠️ Identificação offline falhou silenciosamente")
                     return
                 }
 
-                // Preenche planta
+                // Preenche planta se estiver vazio
                 if self.plantName.isEmpty, !pred.plant.isEmpty {
                     self.plantName = pred.plant
                 }
@@ -394,7 +407,7 @@ struct AddPlantManuallyView: View {
 
                 self.lastConfidence = pred.confidence
 
-                // Observações informando fallback offline
+                // Observações informando fallback offline (apenas se conseguir identificar)
                 let fallbackInfo = "Identificação offline (modelo local) com \(Int(pred.confidence * 100))% de confiança."
                 if self.notes.isEmpty {
                     self.notes = fallbackInfo
@@ -438,7 +451,12 @@ struct AddPlantManuallyView: View {
         classifier.classify(image) { pred in
             DispatchQueue.main.async {
                 self.isPredicting = false
-                guard let pred = pred else { return }
+                
+                // Se não conseguir classificar, não faz nada (silencioso)
+                guard let pred = pred else { 
+                    print("⚠️ Classificação de doença falhou silenciosamente")
+                    return 
+                }
 
                 // Tenta casar com suas doenças comuns; se não houver, usa personalizado
                 if let match = self.tryMatchCommonDisease(named: pred.disease) {
@@ -448,7 +466,6 @@ struct AddPlantManuallyView: View {
                 } else {
                     self.selectedDisease = nil
                     self.customDisease = pred.disease
-                    // TODO: se quiser, preencha tratamento padrão aqui
                 }
 
                 // Atualiza a confiança para mostrar na UI
