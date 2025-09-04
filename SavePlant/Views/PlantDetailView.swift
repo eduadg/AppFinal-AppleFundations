@@ -6,20 +6,18 @@ public struct PlantDetailView: View {
     @State private var newPhoto: UIImage?
     @State private var showingGallery = false
     @State private var galleryIndex: Int = 0
-    @State private var currentMainPhoto: UIImage? // Estado local para a foto principal
     @StateObject private var hospitalData = HospitalDataManager.shared
     @Environment(\.dismiss) private var dismiss
     
     public init(plant: PlantInTreatment) {
         self._plant = State(initialValue: plant)
-        self._currentMainPhoto = State(initialValue: plant.latestPhoto)
     }
     
     public var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: DS.Spacing.lg) {
                 // Main Photo Section
-                if let latestPhoto = currentMainPhoto {
+                if let latestPhoto = plant.latestPhoto {
                     Image(uiImage: latestPhoto)
                         .resizable()
                         .scaledToFill()
@@ -137,11 +135,6 @@ public struct PlantDetailView: View {
             // Atualiza estado local e força refresh da interface
             DispatchQueue.main.async {
                 self.plant = updated
-                self.currentMainPhoto = updated.latestPhoto // Atualiza foto principal imediatamente
-                
-                print("🖼️ Foto principal atualizada para: \(updated.latestPhoto != nil ? "Nova foto" : "Sem foto")")
-                print("📊 Total de análises: \(updated.analyses.count)")
-                print("🔍 Última análise: \(updated.analyses.last?.date.formatted() ?? "N/A")")
                 
                 // Reset do estado da foto para permitir nova seleção
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -157,12 +150,7 @@ public struct PlantDetailView: View {
         .onReceive(hospitalData.$plantsInTreatment) { list in
             if let updated = list.first(where: { $0.id == plant.id }) {
                 plant = updated
-                currentMainPhoto = updated.latestPhoto // Sincroniza foto principal
             }
-        }
-        .onAppear {
-            // Garante que a foto principal esteja sincronizada
-            currentMainPhoto = plant.latestPhoto
         }
     }
 }

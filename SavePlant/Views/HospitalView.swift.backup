@@ -228,14 +228,9 @@ struct AddPlantManuallyView: View {
                         // Plant Name Section + sugestões
                         PlantNameSection(plantName: $plantName)
                         SuggestedDiseasesSection(plantName: $plantName, onSelectDisease: { disease in
-                            print("🔄 Doença selecionada: \(disease.name)")
-                            print("🔄 Estado antes - selectedDisease: \(self.selectedDisease?.name ?? "nil"), customDisease: \(self.customDisease), customTreatment: \(self.customTreatment)")
-                            
                             self.selectedDisease = disease
-                            self.customDisease = disease.name
-                            self.customTreatment = disease.treatment
-                            
-                            print("✅ Estado após - selectedDisease: \(self.selectedDisease?.name ?? "nil"), customDisease: \(self.customDisease), customTreatment: \(self.customTreatment)")
+                            self.customDisease = ""
+                            self.customTreatment = ""
                         })
                         
                         // Disease Selection Section
@@ -247,13 +242,9 @@ struct AddPlantManuallyView: View {
                             showingCustomDisease: $showingCustomDisease
                         )
                         .onChange(of: selectedDisease) { oldValue, newValue in
-                            print("🔄 onChange triggered - oldValue: \(oldValue?.name ?? "nil"), newValue: \(newValue?.name ?? "nil")")
                             if let disease = newValue {
-                                print("🔄 onChange triggered - Doença: \(disease.name)")
                                 // Sempre sincroniza tratamento com a doença selecionada
                                 self.customTreatment = disease.treatment
-                                self.customDisease = disease.name
-                                print("✅ onChange sincronizou - Doença: \(self.customDisease), Tratamento: \(self.customTreatment)")
                             }
                         }
                         
@@ -454,23 +445,15 @@ struct AddPlantManuallyView: View {
     private func savePlant() {
         guard let photo = selectedPhoto else { return }
         
-        print("💾 Salvando planta...")
-        print("📝 Nome: \(plantName)")
-        print("🦠 Doença selecionada: \(selectedDisease?.name ?? "Nenhuma")")
-        print("🦠 Doença customizada: \(customDisease)")
-        print("💊 Tratamento customizado: \(customTreatment)")
-        
         let diseaseName: String
         let treatment: String
         
         if let selectedDisease = selectedDisease {
             diseaseName = selectedDisease.name
             treatment = selectedDisease.treatment
-            print("✅ Usando doença selecionada: \(diseaseName)")
         } else {
             diseaseName = customDisease.trimmingCharacters(in: .whitespacesAndNewlines)
             treatment = customTreatment.trimmingCharacters(in: .whitespacesAndNewlines)
-            print("✅ Usando doença customizada: \(diseaseName)")
         }
         
         let plant = PlantInTreatment(
@@ -604,12 +587,11 @@ struct PlantNameSection: View {
             TextField("Ex: Tomate, Rosa, Orquídea...", text: $plantName)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .font(.body)
-                    }
-            .padding(DS.Spacing.md)
-            .background(Color.white)
-            .cornerRadius(DS.Radius.lg)
-            .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 4)
-            .animation(.easeInOut(duration: 0.3), value: selected)
+        }
+        .padding(DS.Spacing.md)
+        .background(Color.white)
+        .cornerRadius(DS.Radius.lg)
+        .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 4)
     }
 }
 
@@ -620,12 +602,7 @@ struct SuggestedDiseasesSection: View {
     @State private var selected: CommonDisease?
     
     private var suggestions: [CommonDisease] {
-        let diseases = PlantDiseaseKnowledgeBase.suggestDiseases(for: plantName)
-        print("🔍 Sugestões para '\(plantName)': \(diseases.count) doenças encontradas")
-        diseases.forEach { disease in
-            print("  - \(disease.name): \(disease.treatment.prefix(50))...")
-        }
-        return diseases
+        PlantDiseaseKnowledgeBase.suggestDiseases(for: plantName)
     }
     
     var body: some View {
@@ -643,123 +620,67 @@ struct SuggestedDiseasesSection: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                 } else if let selected = selected {
                     // Mostra somente a doença escolhida e botão alterar
-                    VStack(alignment: .leading, spacing: DS.Spacing.sm) {
-                        .transition(.asymmetric(
-                            insertion: .scale.combined(with: .opacity),
-                            removal: .scale.combined(with: .opacity)
-                        ))
-                        HStack {
-                            Image(systemName: selected.iconName)
-                                .font(.title2)
-                                .foregroundColor(DS.ColorSet.brand)
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Doença Selecionada")
-                                    .font(.caption.weight(.semibold))
-                                    .foregroundColor(DS.ColorSet.brand)
-                                    .textCase(.uppercase)
-                                Text(selected.name)
-                                    .font(.headline.weight(.semibold))
-                                    .foregroundColor(DS.ColorSet.textPrimary)
-                            }
-                            Spacer()
-                            Button("Alterar") { 
-                                self.selected = nil 
-                            } label: {
-                                HStack(spacing: 4) {
-                                    Image(systemName: "arrow.clockwise")
-                                        .font(.caption)
-                                    Text("Alterar")
-                                        .font(.caption.weight(.semibold))
-                                }
-                                .foregroundColor(DS.ColorSet.brand)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(DS.ColorSet.brand.opacity(0.1))
-                                .cornerRadius(6)
-                            }
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 8) {
+                    HStack(alignment: .top, spacing: DS.Spacing.sm) {
+                        Image(systemName: selected.iconName)
+                            .foregroundColor(DS.ColorSet.brand)
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(selected.name)
+                                .font(.subheadline.weight(.medium))
+                                .foregroundColor(DS.ColorSet.textPrimary)
                             Text(selected.description)
-                                .font(.subheadline)
+                                .font(.caption)
                                 .foregroundColor(DS.ColorSet.textSecondary)
-                                .lineLimit(nil)
-                            
-                            HStack {
-                                Image(systemName: "cross.case.fill")
-                                    .font(.caption)
-                                    .foregroundColor(DS.ColorSet.brand)
-                                Text("Tratamento Recomendado:")
-                                    .font(.caption.weight(.semibold))
-                                    .foregroundColor(DS.ColorSet.textPrimary)
-                            }
-                            
-                            Text(selected.treatment)
-                                .font(.subheadline)
+                                .lineLimit(3)
+                            Text("Tratamento: \(selected.treatment)")
+                                .font(.caption2)
                                 .foregroundColor(DS.ColorSet.textSecondary)
-                                .padding(.leading, 20)
                         }
+                        Spacer()
+                        Button("Alterar") { self.selected = nil }
+                            .font(.caption.weight(.semibold))
+                            .foregroundColor(DS.ColorSet.brand)
                     }
-                    .padding(DS.Spacing.md)
-                    .background(DS.ColorSet.brand.opacity(0.05))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: DS.Radius.md)
-                            .stroke(DS.ColorSet.brand.opacity(0.2), lineWidth: 1)
-                    )
-                    .cornerRadius(DS.Radius.md)
+                    .padding(DS.Spacing.sm)
+                    .background(DS.ColorSet.brandMuted.opacity(0.15))
+                    .cornerRadius(DS.Radius.sm)
                 } else {
                     VStack(spacing: DS.Spacing.sm) {
-                        .transition(.asymmetric(
-                            insertion: .move(edge: .bottom).combined(with: .opacity),
-                            removal: .move(edge: .top).combined(with: .opacity)
-                        ))
-                        
                         ForEach(suggestions, id: \.id) { disease in
-                            Button(action: {
-                                self.selected = disease
-                                onSelectDisease(disease)
-                            }) {
-                                HStack(spacing: DS.Spacing.sm) {
+                            Button(action: { onSelectDisease(disease) }) {
+                                HStack {
                                     Image(systemName: disease.iconName)
-                                        .font(.title3)
                                         .foregroundColor(DS.ColorSet.brand)
-                                        .frame(width: 24)
-                                    
-                                    VStack(alignment: .leading, spacing: 6) {
+                                    VStack(alignment: .leading, spacing: 4) {
                                         Text(disease.name)
-                                            .font(.subheadline.weight(.semibold))
+                                            .font(.subheadline.weight(.medium))
                                             .foregroundColor(DS.ColorSet.textPrimary)
                                         Text(disease.description)
                                             .font(.caption)
                                             .foregroundColor(DS.ColorSet.textSecondary)
                                             .lineLimit(2)
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    VStack(alignment: .trailing, spacing: 4) {
-                                        Text("Selecionar")
-                                            .font(.caption.weight(.semibold))
-                                            .foregroundColor(.white)
-                                            .padding(.horizontal, 12)
-                                            .padding(.vertical, 6)
-                                            .background(DS.ColorSet.brand)
-                                            .cornerRadius(8)
-                                        
-                                        Text("Tratamento disponível")
+                                        Text("Tratamento: \(disease.treatment)")
                                             .font(.caption2)
                                             .foregroundColor(DS.ColorSet.textSecondary)
+                                            .lineLimit(2)
                                     }
+                                    Spacer()
+                                    Text("Selecionar")
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 6)
+                                        .background(DS.ColorSet.brand)
+                                        .cornerRadius(8)
                                 }
-                                .padding(DS.Spacing.md)
-                                .background(Color.white)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: DS.Radius.sm)
-                                        .stroke(DS.ColorSet.brand.opacity(0.2), lineWidth: 1)
-                                )
+                                .padding(DS.Spacing.sm)
+                                .background(DS.ColorSet.brandMuted.opacity(0.15))
                                 .cornerRadius(DS.Radius.sm)
                             }
                             .buttonStyle(PlainButtonStyle())
+                            .onTapGesture {
+                                self.selected = disease
+                                onSelectDisease(disease)
+                            }
                         }
                     }
                 }
