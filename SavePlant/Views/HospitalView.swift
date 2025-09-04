@@ -609,7 +609,6 @@ struct PlantNameSection: View {
             .background(Color.white)
             .cornerRadius(DS.Radius.lg)
             .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 4)
-            .animation(.easeInOut(duration: 0.3), value: selected)
     }
 }
 
@@ -644,10 +643,6 @@ struct SuggestedDiseasesSection: View {
                 } else if let selected = selected {
                     // Mostra somente a doença escolhida e botão alterar
                     VStack(alignment: .leading, spacing: DS.Spacing.sm) {
-                        .transition(.asymmetric(
-                            insertion: .scale.combined(with: .opacity),
-                            removal: .scale.combined(with: .opacity)
-                        ))
                         HStack {
                             Image(systemName: selected.iconName)
                                 .font(.title2)
@@ -709,11 +704,6 @@ struct SuggestedDiseasesSection: View {
                     .cornerRadius(DS.Radius.md)
                 } else {
                     VStack(spacing: DS.Spacing.sm) {
-                        .transition(.asymmetric(
-                            insertion: .move(edge: .bottom).combined(with: .opacity),
-                            removal: .move(edge: .top).combined(with: .opacity)
-                        ))
-                        
                         ForEach(suggestions, id: \.id) { disease in
                             Button(action: {
                                 self.selected = disease

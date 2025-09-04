@@ -120,9 +120,8 @@ public class EncyclopediaDataManager: ObservableObject {
     
     public func likePost(_ post: EncyclopediaPost) {
         if let index = posts.firstIndex(where: { $0.id == post.id }) {
-            var updatedPost = posts[index]
-            // Note: Como EncyclopediaPost é struct, precisaríamos de uma abordagem diferente
-            // Por agora, vamos manter o likes como está
+            // TODO: Implementar sistema de likes quando EncyclopediaPost for class
+            // Por enquanto, mantemos como está
         }
     }
     
