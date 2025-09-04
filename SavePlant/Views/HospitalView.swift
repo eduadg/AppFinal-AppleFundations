@@ -638,34 +638,34 @@ struct SuggestedDiseasesSection: View {
         let trimmedPlantName = plantName.trimmingCharacters(in: .whitespacesAndNewlines)
         
         if trimmedPlantName.isEmpty {
-            return EmptyView()
-        }
-        
-        return VStack(spacing: DS.Spacing.md) {
-            // Header
-            Text("Sugestões de Doenças para \(trimmedPlantName)")
-                .font(.headline.weight(.semibold))
-                .foregroundColor(DS.ColorSet.textPrimary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            
-            // Content based on state
-            if suggestions.isEmpty {
-                EmptySuggestionsView()
-            } else if let selected = selected {
-                SelectedDiseaseView(selected: selected) {
-                    self.selected = nil
-                }
-            } else {
-                DiseaseSuggestionsList(suggestions: suggestions) { disease in
-                    self.selected = disease
-                    onSelectDisease(disease)
+            EmptyView()
+        } else {
+            VStack(spacing: DS.Spacing.md) {
+                // Header
+                Text("Sugestões de Doenças para \(trimmedPlantName)")
+                    .font(.headline.weight(.semibold))
+                    .foregroundColor(DS.ColorSet.textPrimary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                // Content based on state
+                if suggestions.isEmpty {
+                    EmptySuggestionsView()
+                } else if let selected = selected {
+                    SelectedDiseaseView(selected: selected) {
+                        self.selected = nil
+                    }
+                } else {
+                    DiseaseSuggestionsList(suggestions: suggestions) { disease in
+                        self.selected = disease
+                        onSelectDisease(disease)
+                    }
                 }
             }
+            .padding(DS.Spacing.md)
+            .background(Color.white)
+            .cornerRadius(DS.Radius.lg)
+            .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 4)
         }
-        .padding(DS.Spacing.md)
-        .background(Color.white)
-        .cornerRadius(DS.Radius.lg)
-        .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 4)
     }
 }
 
