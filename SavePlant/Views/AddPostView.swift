@@ -66,7 +66,7 @@ public struct AddPostView: View {
                         )
                         
                         // Photo Section
-                        PhotoSection(
+                        AddPostPhotoSection(
                             selectedPhoto: $selectedPhoto,
                             showingImagePicker: $showingImagePicker
                         )
@@ -365,8 +365,8 @@ struct CategorySelectionButton: View {
     }
 }
 
-// MARK: - Photo Section
-struct PhotoSection: View {
+// MARK: - Add Post Photo Section
+struct AddPostPhotoSection: View {
     @Binding var selectedPhoto: UIImage?
     @Binding var showingImagePicker: Bool
     
